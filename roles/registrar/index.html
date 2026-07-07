@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCCTEST Portal - Registrar Intake Hub</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --navy-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --border: #cbd5e1;
+            --text: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
+        .sidebar h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; text-align: center; }
+        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .nav-item { padding: 10px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
+        .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
+        
+        .main-content { flex: 1; padding: 35px; overflow-y: auto; }
+        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 24px; color: var(--navy-dark); }
+        .role-tag { background-color: #e0e7ff; color: var(--primary-blue); font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; }
+        
+        .card { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background-color: var(--bg-light); }
+        .btn { padding: 10px 20px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background-color: var(--primary); color: white; }
+        .btn:hover { background-color: var(--primary-dark); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <h2>MCC Registrar</h2>
+            <nav class="nav-links">
+                <a href="#" class="nav-item active">Online Admission Intake</a>
+                <a href="#" class="nav-item">Course Batch Rosters</a>
+                <a href="#" class="nav-item">DPA Compliance Vault</a>
+                <a href="#" class="nav-item">Terminal Audit Reports</a>
+            </nav>
+        </div>
+        <a href="../../index.html" class="nav-item back-btn">➔ Back to Portal Gateway</a>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>Online Student Intake & Registration Management</h1>
+                <p style="font-size: 13px; color: #64748b;">Processing applicant fields mapped straight to standard TESDA Form NMIS-01 requirements.</p>
+            </div>
+            <span class="role-tag">Registrar Office Module</span>
+        </div>
+        
+        <div class="card">
+            <h3>Trainee Enrollment Form Sheets</h3>
+            <form onsubmit="event.preventDefault(); alert('Trainee field layout validated against active constraints and saved successfully.');">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>TESDA Unique Learner Identifier (14-Digit ULI)</label>
+                        <input type="text" placeholder="e.g., ULI-90-XYZ-87611" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Legal Name</label>
+                        <input type="text" placeholder="Last Name, First Name, Middle Initial" required>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Target Course Specialization Roster</label>
+                        <select required>
+                            <option value="">-- Choose Mandated Allocation Block --</option>
+                            <option>Computer Systems Servicing NC II</option>
+                            <option>Shielded Metal Arc Welding (SMAW) NC I</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Privacy Release Status (Mandatory Compliance Check)</label>
+                        <select required>
+                            <option value="">-- Verify Signed Release Verification --</option>
+                            <option>DPA Consent Completed & Archived</option>
+                            <option>Parental/Guardian Form Checked Out (Minor Exception)</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn">Verify & Lock Enrollment Roster</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

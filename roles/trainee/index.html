@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCCTEST Portal - Trainee Workspace</title>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #047857;
+            --navy-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --border: #cbd5e1;
+            --text: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
+        .sidebar h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; text-align: center; }
+        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .nav-item { padding: 10px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
+        .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
+        
+        .main-content { flex: 1; padding: 35px; overflow-y: auto; }
+        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 24px; color: var(--navy-dark); }
+        .role-tag { background-color: #d1fae5; color: var(--primary-dark); font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; }
+        
+        .card { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background-color: var(--bg-light); border: 1px solid var(--border); padding: 15px; border-radius: 6px; text-align: center; }
+        .btn { padding: 10px 18px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background-color: var(--primary-blue); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="app-sidebar">
+            <div class="user-profile-box" style="text-align: center; padding-bottom: 15px; border-bottom: 1px solid #334155; margin-bottom: 15px;">
+                <h3 style="font-size:14px; color:white;">Christian Alvarez</h3>
+                <span style="font-size:11px; color:var(--primary);">ULI-2026-00981</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#" class="nav-item active">My Performance Analytics</a>
+                <a href="#" class="nav-item">Class Schedule Matrices</a>
+                <a href="#" class="nav-item">Instructor Evaluation</a>
+                <a href="#" class="nav-item">My Digital Certificates</a>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1>Trainee Performance Profile Dashboard</h1>
+                    <p style="font-size: 13px; color: #64748b;">Localized student tracking and automated certification boundaries.</p>
+                </div>
+                <span class="role-tag">Active Trainee Portal</span>
+            </div>
+            
+            <div class="card">
+                <h3>Current Curricular Lifecycle Progress</h3>
+                <div class="grid-3">
+                    <div class="stat-box">
+                        <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:bold;">Attendance Ratio</span>
+                        <h4 style="font-size:20px; color:var(--primary-dark);">95.2% Pass</h4>
+                    </div>
+                    <div class="stat-box">
+                        <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:bold;">Modular Sign-offs</span>
+                        <h4 style="font-size:20px; color:var(--navy-dark);">4 / 4 Completed</h4>
+                    </div>
+                    <div class="stat-box">
+                        <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:bold;">Evaluation Standing</span>
+                        <h4 style="font-size:20px; color:#1e40af;">Competent (C)</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Automated National Clearance Tracking</h3>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Your digital institutional certificate generates automatically as soon as administrative constraints validate completely inside the PostgreSQL layer.</p>
+                <button class="btn btn-success" onclick="alert('Pre-conditions verified: Fetching secure certificate layout bundle...');">Securely Download Certificate of Completion (.PDF)</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

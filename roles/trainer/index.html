@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCCTEST Portal - Trainer Evaluation Portal</title>
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --navy-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --border: #cbd5e1;
+            --text: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
+        .sidebar h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; text-align: center; }
+        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .nav-item { padding: 10px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
+        .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
+        
+        .main-content { flex: 1; padding: 35px; overflow-y: auto; }
+        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 24px; color: var(--navy-dark); }
+        .role-tag { background-color: #fef3c7; color: var(--primary-dark); font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; }
+        
+        .card { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
+        th { background-color: #f1f5f9; font-weight: 600; }
+        .btn { padding: 8px 16px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background-color: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <h2>MCC Instructor</h2>
+            <nav class="nav-links">
+                <a href="#" class="nav-item active">Competency Checklists</a>
+                <a href="#" class="nav-item">Classroom Resource Matrix</a>
+                <a href="#" class="nav-item">Attendance Cutoff Tracker</a>
+                <a href="#" class="nav-item">Submit Batch Metrics</a>
+            </nav>
+        </div>
+        <a href="../../index.html" class="nav-item back-btn">➔ Back to Portal Gateway</a>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Active Class Roster Checkpoints</h2>
+                <p style="font-size: 13px; color: #64748b;">Sign off modular training block benchmarks and attendance criteria rules.</p>
+            </div>
+            <span class="role-tag">COURSE TRAINER DASHBOARD</span>
+        </div>
+        
+        <div class="card">
+            <h3>Active Roster: Computer Systems Servicing NC II</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trainee ULI</th>
+                        <th>Student Name</th>
+                        <th>Attendance Block Log</th>
+                        <th>Practical Skill Competency Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>ULI-2026-00981</code></td>
+                        <td>Alvarez, Christian</td>
+                        <td style="color:green; font-weight:bold;">94% Attendance</td>
+                        <td>
+                            <select style="padding:4px; font-size:12px;">
+                                <option>Pending Checkoff</option>
+                                <option>Competent (C)</option>
+                                <option>Not Yet Competent (NYC)</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>ULI-2026-00442</code></td>
+                        <td>Mercado, Beatrice</td>
+                        <td style="color:red; font-weight:bold;">68% [DROPPED EXCEPTION]</td>
+                        <td><select style="padding:4px; font-size:12px;" disabled><option>Locked - Under Attendance Threshold</option></select></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn" style="margin-top: 15px;" onclick="alert('Roster performance indicators committed to relational views.');">Save Grading Matrix Logs</button>
+        </div>
+    </div>
+</body>
+</html>
