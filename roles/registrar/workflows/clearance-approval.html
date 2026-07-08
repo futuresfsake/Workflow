@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clearance Approval for Graduating List</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1d4ed8;
+            --bg-light: #f8fafc;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+            --info-bg: #f0fdf4;
+            --info-border: #d1fae5;
+            --info-text: #15803d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); padding: 40px; min-height: 100vh; display: flex; justify-content: center; }
+
+        .container { width: 100%; max-width: 750px; background: white; padding: 40px; border-radius: 12px; border: 1px solid var(--border-muted); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+
+        .feature-meta { font-size: 11px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .task-title { font-size: 22px; color: var(--navy-dark); font-weight: 700; margin-bottom: 30px; border-bottom: 2px solid var(--border-muted); padding-bottom: 12px; }
+        
+        /* Unified Continuous Vertical Stepper Engine */
+        .step-block { display: grid; grid-template-columns: 35px 1fr; gap: 15px; padding-bottom: 35px; position: relative; }
+        .step-block::after {
+            content: ''; position: absolute; left: 16px; top: 24px; bottom: -6px; width: 2px; background-color: var(--border-muted); z-index: 1;
+        }
+        .step-block:last-child::after { display: none; }
+        .step-block:last-child { padding-bottom: 5px; }
+
+        .step-number { 
+            font-size: 11px; font-weight: 700; color: #64748b; background: #e2e8f0;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; justify-self: center; z-index: 2; position: relative; border: 2px solid white;
+        }
+        .step-block.completed .step-number { background: #22c55e; color: white; border-color: #22c55e; }
+        .step-block.active .step-number { background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 0 0 3px #dbeafe; }
+        
+        .step-content { padding-top: 2px; }
+        .step-name { font-size: 14px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+        .step-description { font-size: 13px; color: #475569; line-height: 1.5; }
+        
+        /* Interactive Triggers */
+        .blue-highlight-btn { background: var(--accent-blue); color: white; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
+        .blue-highlight-btn:hover { background: var(--accent-blue-dark); }
+        .action-btn { background: #22c55e; color: white; border: none; padding: 10px 14px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 15px; }
+        .action-btn:hover { background: #16a34a; }
+        .click-link { color: var(--accent-blue); font-weight: 600; cursor: pointer; text-decoration: none; background: none; border: none; }
+
+        /* Popup Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 12px; width: 680px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-muted); }
+        
+        .step-callout { border-radius: 6px; padding: 12px; font-size: 12.5px; line-height: 1.5; margin-top: 10px; border: 1px solid var(--border-muted); }
+        .callout-warning { background-color: var(--warning-bg); border-color: var(--warning-border); color: var(--warning-text); }
+        .callout-info { background-color: var(--info-bg); border-color: var(--info-border); color: var(--info-text); }
+        
+        /* Queue Table Styling */
+        .clearance-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .clearance-table th { background: #f1f5f9; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; padding: 10px; text-align: left; }
+        .clearance-table td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid var(--border-muted); color: var(--text-main); }
+
+        .text-success { color: #16a34a; font-weight: bold; }
+        .text-danger { color: #dc2626; font-weight: bold; }
+        code { background-color: #e2e8f0; padding: 1px 4px; border-radius: 4px; font-family: monospace; font-size: 11.5px; color: var(--navy-dark); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="feature-meta">Final Graduation Audit Loop</div>
+        <div class="task-title">Clearance Approval Workflow</div>
+
+        <main class="stepper-pane">
+            
+            <div class="step-block completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Trainer Evaluation Flag</div>
+                    <div class="step-description">The course trainer logs competency marks and flags eligible students as <code>COMPETENT (C)</code> in the database layer.</div>
+                </div>
+            </div>
+
+            <div class="step-block completed">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Receive Candidates List</div>
+                    <div class="step-description">The registrar workspace context instantly populates with the names of all trainees who successfully passed the technical course parameters.</div>
+                </div>
+            </div>
+
+            <div class="step-block active">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Cross-Check & Authorize Clearance Requirements</div>
+                    <div class="step-description">
+                        Open the clearance matrix to verify uniform returns, ID compliance, and transaction statements before sign-off. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('clearance-modal', true)">View Clearance Matrix Screen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-name">Append to Graduation List Database</div>
+                    <div class="step-description">Once the registrar signs off, the system automatically writes the student row to the permanent graduation list indices.</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <div id="clearance-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Graduation Clearance Audit Center</h3>
+                <button type="button" class="click-link" onclick="toggleModal('clearance-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
+            </div>
+            
+            <p style="font-size: 13px; color: #475569; line-height: 1.5;">
+                Review the centralized verification attributes mapping from past modules. All tracking constraints must pass cleanly before hitting the final data write hook.
+            </p>
+
+            <table class="clearance-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Uniform Release</th>
+                        <th>ID Serial</th>
+                        <th>Payment Ledger</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Juan Dela Cruz</strong></td>
+                        <td><span class="text-success">Returned</span></td>
+                        <td><span class="text-success">Cleared</span></td>
+                        <td><span class="text-success">Paid (₱0 Balance)</span></td>
+                        <td><button type="button" class="click-link" onclick="approveClearance('Juan Dela Cruz')">Sign Off Clearance</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maria Santos</strong></td>
+                        <td><span class="text-success">Returned</span></td>
+                        <td><span class="text-success">Cleared</span></td>
+                        <td><span class="text-danger">Unpaid Balance</span></td>
+                        <td><button type="button" class="click-link" style="color: #64748b; cursor: not-allowed;" onclick="triggerConstraintBlock('Maria Santos')">Block Sign-Off</button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="step-callout callout-warning">
+                <div style="display: flex; align-items: center; gap: 6px; font-weight: bold; margin-bottom: 4px;">
+                    <span>⚠️</span> SYSTEM INTEGRITY HARD-STOP CONSTRAINT
+                </div>
+                The system uses strict relational constraint logic. The checkout route enforces that if any structural property flag—including <code>uniform_status</code>, <code>id_serial_status</code>, or <code>payment_balance</code>—contains negative parameters, the system blocks code execution and denies access to the graduation list table wrapper.
+            </div>
+
+            <div class="step-callout callout-info" style="border-left-color: #22c55e;">
+                <div style="color: #16a34a; font-weight: bold; text-transform: uppercase; font-size: 11px; tracking: 0.5px; margin-bottom: 4px;">
+                    🟢 Next-Step Automation Pipeline Trigger
+                </div>
+                Successfully signing off clearance fires an atomic PostgreSQL query hook that dynamically shifts the active student record to the <strong>Graduation List Database Table</strong>, prompting the system's external registrar queue to auto-generate and certificate-stamp their final technical completion templates.
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        function toggleModal(modalId, isVisible) {
+            const targetModal = document.getElementById(modalId);
+            if (isVisible) {
+                targetModal.classList.add('active');
+            } else {
+                targetModal.classList.remove('active');
+            }
+        }
+
+        function approveClearance(studentName) {
+            alert(`[CLEARANCE AUTHORIZED]\n\nRelational query constraints checked successfully for: ${studentName}.\n\nStudent entry cleanly appended to the system's Graduation List Database table. Automated certification hooks initialized.`);
+            toggleModal('clearance-modal', false);
+        }
+
+        function triggerConstraintBlock(studentName) {
+            alert(`[DATABASE EXCEPTION BLOCKED]\n\nOperation denied for: ${studentName}.\n\nConstraint Error: Account presents unresolved fiscal/payment ledger balances. Entry cannot be written to the graduation directory.`);
+        }
+    </script>
+</body>
+</html>

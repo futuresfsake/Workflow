@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admission Verification Step Loop</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1d4ed8;
+            --bg-light: #f8fafc;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); padding: 40px; min-height: 100vh; display: flex; justify-content: center; }
+
+        .container { width: 100%; max-width: 750px; background: white; padding: 40px; border-radius: 12px; border: 1px solid var(--border-muted); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+
+        .feature-meta { font-size: 11px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .task-title { font-size: 22px; color: var(--navy-dark); font-weight: 700; margin-bottom: 30px; border-bottom: 2px solid var(--border-muted); padding-bottom: 12px; }
+        
+        /* Unified Continuous Vertical Stepper Engine */
+        .step-block { display: grid; grid-template-columns: 35px 1fr; gap: 15px; padding-bottom: 35px; position: relative; }
+        .step-block::after {
+            content: ''; position: absolute; left: 16px; top: 24px; bottom: -6px; width: 2px; background-color: var(--border-muted); z-index: 1;
+        }
+        .step-block:last-child::after { display: none; }
+        .step-block:last-child { padding-bottom: 5px; }
+
+        .step-number { 
+            font-size: 11px; font-weight: 700; color: #64748b; background: #e2e8f0;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; justify-self: center; z-index: 2; position: relative; border: 2px solid white;
+        }
+        .step-block.completed .step-number { background: #22c55e; color: white; border-color: #22c55e; }
+        .step-block.active .step-number { background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 0 0 3px #dbeafe; }
+        
+        .step-content { padding-top: 2px; }
+        .step-name { font-size: 14px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+        .step-description { font-size: 13px; color: #475569; line-height: 1.5; }
+        
+        /* Micro Buttons and Triggers */
+        .click-link { color: var(--accent-blue); font-weight: 600; cursor: pointer; text-decoration: none; background: none; border: none; font-size: 13px; }
+        .click-link:hover { color: var(--accent-blue-dark); text-decoration: underline; }
+        
+        /* Highlighted Blue Action Button */
+        .blue-highlight-btn { background: var(--accent-blue); color: white; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
+        .blue-highlight-btn:hover { background: var(--accent-blue-dark); }
+        .action-btn { background: #22c55e; color: white; border: none; padding: 10px 14px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .action-btn:hover { background: #16a34a; }
+
+        /* Document Inspection Modal Popup */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 12px; width: 680px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-muted); }
+        
+        .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 15px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid var(--border-muted); border-radius: 6px; font-size: 13px; color: var(--navy-dark); background: var(--bg-light); }
+        .step-callout { border-radius: 6px; padding: 10px; font-size: 12px; border-left: 4px solid #f59e0b; background-color: var(--warning-bg); border: 1px solid var(--warning-border); border-left-color: #f59e0b; color: var(--warning-text); line-height: 1.4; }
+
+        .admission-table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--border-muted); margin-top: 10px; }
+        .admission-table th { background: #f1f5f9; text-align: left; padding: 8px 10px; font-size: 11px; color: #475569; }
+        .admission-table td { padding: 10px; font-size: 13px; border-bottom: 1px solid var(--border-muted); }
+        code { background-color: #e2e8f0; padding: 1px 4px; border-radius: 4px; font-family: monospace; font-size: 11.5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="feature-meta">Stage 1 Processing Loop</div>
+        <div class="task-title">Registrar Admission Verification Portal</div>
+
+        <main class="stepper-pane">
+            
+            <div class="step-block completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Open Registrar Portal</div>
+                    <div class="step-description">Access the secure admin workspace from the primary system login portal router.</div>
+                </div>
+            </div>
+
+            <div class="step-block completed">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Click Admissions List</div>
+                    <div class="step-description">
+                        Launch the master queue table containing all incoming application files. <br>
+                        <button type="button" class="click-link" onclick="toggleModal('admissions-modal', true)">[Click View Admissions List]</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block active">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Verify and Inspect Student Digital Documents</div>
+                    <div class="step-description">
+                        Click the high-visibility blue inspection button below to securely open the digital documents workspace modal. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('inspection-modal', true)">View Document Inspection</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-name">Cross-Reference Data Fields</div>
+                    <div class="step-description">Run verification audits checking inputted fields directly against scanned document structures. </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <div class="step-name">Send Trigger to System Dashboard</div>
+                    <div class="step-description">Authorize conditional acceptance to transition the candidate to the onsite evaluation registry.</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <div id="admissions-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Pending Admissions Profiles</h3>
+                <button type="button" class="click-link" onclick="toggleModal('admissions-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
+            </div>
+            <table class="admission-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Target Program</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Juan Dela Cruz</strong></td>
+                        <td><code>CSS-NC2-2026A</code></td>
+                        <td><span style="color: #64748b; font-weight: bold; font-size: 11px;">PENDING</span></td>
+                        <td><button type="button" class="click-link" onclick="selectStudent('Juan Dela Cruz')">Select Target</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maria Santos</strong></td>
+                        <td><code>VGD-NC3-2026B</code></td>
+                        <td><span style="color: #64748b; font-weight: bold; font-size: 11px;">PENDING</span></td>
+                        <td><button type="button" class="click-link" onclick="selectStudent('Maria Santos')">Select Target</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="inspection-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 780px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Document Inspection Workspace Mockup</h3>
+                <button type="button" class="click-link" onclick="toggleModal('inspection-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
+            </div>
+            
+            <div class="portal-grid">
+                <div style="background: #e2e8f0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; border: 2px dashed #cbd5e1; height: 280px;">
+                    <span style="font-size: 32px; margin-bottom: 10px;">📄</span>
+                    <span style="font-size: 13px; font-weight: 600; color: var(--navy-dark);">view_submitted_documents.pdf</span>
+                    <span style="font-size: 11px; color: #64748b; margin-top: 4px;">[Cryptographic Verification Secured]</span>
+                </div>
+
+                <div>
+                    <div class="form-group">
+                        <label>Active Trainee Profile</label>
+                        <input type="text" id="target-student" value="Juan Dela Cruz" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Cross-Reference Field Match</label>
+                        <input type="text" value="JUAN DELA CRUZ" disabled style="letter-spacing: 0.5px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Pipeline Status Control</label>
+                        <select>
+                            <option value="CONDITIONALLY_APPROVED">CONDITIONALLY_APPROVED</option>
+                        </select>
+                    </div>
+                    
+                    <div class="step-callout">
+                        <strong>Rule Description:</strong> Clicking the validation button below executes an atomic database transaction to update the active row pointer.
+                    </div>
+                    
+                    <button type="button" class="action-btn" onclick="commitDatabaseUpdate()">
+                        Update Database Row
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function toggleModal(modalId, isVisible) {
+            const targetModal = document.getElementById(modalId);
+            if (isVisible) {
+                targetModal.classList.add('active');
+            } else {
+                targetModal.classList.remove('active');
+            }
+        }
+
+        function selectStudent(studentName) {
+            document.getElementById('target-student').value = studentName;
+            toggleModal('admissions-modal', false);
+            alert(`Context loaded for target: ${studentName}. Click the blue "View Document Inspection" button next.`);
+        }
+
+        function commitDatabaseUpdate() {
+            const traineeName = document.getElementById('target-student').value;
+            alert(`Row update executed! PostgreSQL state flag set to [CONDITIONALLY_APPROVED] for: ${traineeName}.`);
+            toggleModal('inspection-modal', false);
+        }
+    </script>
+</body>
+</html>

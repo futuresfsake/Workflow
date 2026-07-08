@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information Bar Purpose</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1d4ed8;
+            --bg-light: #f8fafc;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --info-bg: #f0fdf4;
+            --info-border: #d1fae5;
+            --info-text: #15803d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); padding: 40px; min-height: 100vh; display: flex; justify-content: center; }
+
+        .container { width: 100%; max-width: 750px; background: white; padding: 40px; border-radius: 12px; border: 1px solid var(--border-muted); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+
+        .feature-meta { font-size: 11px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .task-title { font-size: 22px; color: var(--navy-dark); font-weight: 700; margin-bottom: 30px; border-bottom: 2px solid var(--border-muted); padding-bottom: 12px; }
+        
+        /* Continuous Stepper Design Setup */
+        .step-block { display: grid; grid-template-columns: 35px 1fr; gap: 15px; padding-bottom: 35px; position: relative; }
+        .step-block::after {
+            content: ''; position: absolute; left: 16px; top: 24px; bottom: -6px; width: 2px; background-color: var(--border-muted); z-index: 1;
+        }
+        .step-block:last-child::after { display: none; }
+        .step-block:last-child { padding-bottom: 5px; }
+
+        .step-number { 
+            font-size: 11px; font-weight: 700; color: #64748b; background: #e2e8f0;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; justify-self: center; z-index: 2; position: relative; border: 2px solid white;
+        }
+        .step-block.completed .step-number { background: #22c55e; color: white; border-color: #22c55e; }
+        .step-block.active .step-number { background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 0 0 3px #dbeafe; }
+        
+        .step-content { padding-top: 2px; }
+        .step-name { font-size: 14px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+        .step-description { font-size: 13px; color: #475569; line-height: 1.5; }
+        
+        /* Interactive Utilities */
+        .blue-highlight-btn { background: var(--accent-blue); color: white; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
+        .blue-highlight-btn:hover { background: var(--accent-blue-dark); }
+        .click-link { color: var(--accent-blue); font-weight: 600; cursor: pointer; text-decoration: none; background: none; border: none; }
+
+        /* Popup Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 12px; width: 700px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-muted); }
+
+        /* Mock Profile Component Bar Layout */
+        .info-bar-mockup { 
+            background: #f1f5f9; 
+            border: 1px solid var(--border-muted); 
+            border-radius: 8px; 
+            padding: 12px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .mock-block { display: flex; flex-direction: column; gap: 3px; }
+        .mock-label { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .mock-value { font-size: 13px; font-weight: 600; color: var(--navy-dark); }
+
+        .status-badge { background: #d1fae5; color: #065f46; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+        code { background-color: #e2e8f0; padding: 1px 4px; border-radius: 4px; font-family: monospace; font-size: 11.5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="feature-meta">Layout Architecture Study</div>
+        <div class="task-title">Student Information Bar</div>
+
+        <main class="stepper-pane">
+            
+            <div class="step-block completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Establish Persistent Profile Context</div>
+                    <div class="step-description">Anchors the student's legal name and identifier records securely across the workspace grid viewport wrapper.</div>
+                </div>
+            </div>
+
+            <div class="step-block active">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Examine Real-Time Data Parameters</div>
+                    <div class="step-description">
+                        View active system-routing properties, account balances, and TESDA certification tracks at a glance. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('infobar-modal', true)">View Information Bar Layout</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Eliminate Screen Overwhelm</div>
+                    <div class="step-description">By stacking fundamental metadata into a neat header element, the lower workspace area stays cleanly dedicated to active logs, checking items, or data entries.</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <div id="infobar-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 5px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Student Header Information Bar Mockup</h3>
+                <button type="button" class="click-link" onclick="toggleModal('infobar-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
+            </div>
+            
+            <p style="font-size: 12.5px; color: #64748b; margin-top: 10px;">Below is the high-density horizontal layout designed to remain fixed at the top of comprehensive evaluation pages from the registrar perspective.</p>
+
+            <div class="info-bar-mockup">
+                <div class="mock-block">
+                    <span class="mock-label">Trainee Identity</span>
+                    <span class="mock-value">Juan Dela Cruz</span>
+                </div>
+                <div class="mock-block">
+                    <span class="mock-label">TESDA ULI ID</span>
+                    <span class="mock-value"><code>ULI-2026-4495-A</code></span>
+                </div>
+                <div class="mock-block">
+                    <span class="mock-label">Class Allocation</span>
+                    <span class="mock-value"><code>CSS-NC2-2026A</code></span>
+                </div>
+                <div class="mock-block">
+                    <span class="mock-label">System Architecture Root</span>
+                    <span class="mock-value" style="color: var(--accent-blue); font-weight: bold;">TESDA (T2MIS)</span>
+                </div>
+                <div class="mock-block">
+                    <span class="mock-label">Financial Balance</span>
+                    <span class="mock-value" style="color: #16a34a;">₱0.00 (Cleared)</span>
+                </div>
+                <div class="mock-block">
+                    <span class="mock-label">Pipeline State</span>
+                    <span class="status-badge">Fully Enrolled</span>
+                </div>
+            </div>
+
+            <div style="background: #fafafa; border: 1px solid var(--border-muted); padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #475569;">
+                <strong>Capstone Panel Review Pointer:</strong> This profile header queries your centralized PostgreSQL database instance only once upon mounting, creating zero processing drag while protecting roles and keeping data clear for the operator.
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function toggleModal(modalId, isVisible) {
+            const targetModal = document.getElementById(modalId);
+            if (isVisible) {
+                targetModal.classList.add('active');
+            } else {
+                targetModal.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

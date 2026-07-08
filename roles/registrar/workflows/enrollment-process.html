@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Onsite Enrollment Process</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1d4ed8;
+            --bg-light: #f8fafc;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+            --info-bg: #f0fdf4;
+            --info-border: #d1fae5;
+            --info-text: #15803d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); padding: 40px; min-height: 100vh; display: flex; justify-content: center; }
+
+        .container { width: 100%; max-width: 750px; background: white; padding: 40px; border-radius: 12px; border: 1px solid var(--border-muted); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+
+        .feature-meta { font-size: 11px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .task-title { font-size: 22px; color: var(--navy-dark); font-weight: 700; margin-bottom: 30px; border-bottom: 2px solid var(--border-muted); padding-bottom: 12px; }
+        
+        /* Unified Continuous Vertical Stepper Engine */
+        .step-block { display: grid; grid-template-columns: 35px 1fr; gap: 15px; padding-bottom: 35px; position: relative; }
+        .step-block::after {
+            content: ''; position: absolute; left: 16px; top: 24px; bottom: -6px; width: 2px; background-color: var(--border-muted); z-index: 1;
+        }
+        .step-block:last-child::after { display: none; }
+        .step-block:last-child { padding-bottom: 5px; }
+
+        .step-number { 
+            font-size: 11px; font-weight: 700; color: #64748b; background: #e2e8f0;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; justify-self: center; z-index: 2; position: relative; border: 2px solid white;
+        }
+        .step-block.completed .step-number { background: #22c55e; color: white; border-color: #22c55e; }
+        .step-block.active .step-number { background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 0 0 3px #dbeafe; }
+        
+        .step-content { padding-top: 2px; }
+        .step-name { font-size: 14px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+        .step-description { font-size: 13px; color: #475569; line-height: 1.5; }
+        
+        /* Interactive Control Triggers */
+        .blue-highlight-btn { background: var(--accent-blue); color: white; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
+        .blue-highlight-btn:hover { background: var(--accent-blue-dark); }
+        .action-btn { background: #22c55e; color: white; border: none; padding: 10px 14px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .action-btn:hover { background: #16a34a; }
+        .click-link { color: var(--accent-blue); font-weight: 600; cursor: pointer; text-decoration: none; background: none; border: none; }
+
+        /* Popup Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 12px; width: 650px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-muted); }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid var(--border-muted); border-radius: 6px; font-size: 13px; color: var(--navy-dark); background: var(--bg-light); }
+        
+        .checklist-group { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .checklist-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); }
+        .checklist-item input { width: 16px; height: 16px; cursor: pointer; }
+
+        .step-callout { border-radius: 6px; padding: 10px; font-size: 12px; line-height: 1.4; margin-top: 10px; border: 1px solid var(--border-muted); }
+        .callout-info { background-color: var(--info-bg); border-color: var(--info-border); color: var(--info-text); }
+        .callout-warning { background-color: var(--warning-bg); border-color: var(--warning-border); color: var(--warning-text); }
+        
+        code { background-color: #e2e8f0; padding: 1px 4px; border-radius: 4px; font-family: monospace; font-size: 11.5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="feature-meta">Stage 2 Processing Loop</div>
+        <div class="task-title">Onsite Student Enrollment Process</div>
+
+        <main class="stepper-pane">
+            
+            <div class="step-block completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Open Registrar Portal</div>
+                    <div class="step-description">Access the authorized operator deployment hub window from the secure system instance framework.</div>
+                </div>
+            </div>
+
+            <div class="step-block completed">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Click "Enroll a Student"</div>
+                    <div class="step-description">Initialize a fresh entry instance inside the centralized data storage schema.</div>
+                </div>
+            </div>
+
+            <div class="step-block active">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Input Student Information & Document Checkoff</div>
+                    <div class="step-description">
+                        Physically reference the student's paper files to copy input criteria and check off the document requirements bundle. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('enrollment-modal', true)">Open Enrollment Portal Screen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-name">Process Transaction Fee & Set Clearance</div>
+                    <div class="step-description">Receive the payment, check the fiscal confirmation field box, and commit the ledger status pointer variable to cleared.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <div class="step-name">Configure Course Program & Class Scheduling</div>
+                    <div class="step-description">
+                        Map the verified candidate into a target program track cohort and allocate class timetable blocks. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('scheduling-modal', true)">Open Scheduling Matrix Screen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <div class="step-name">Automated Student Credential Generation</div>
+                    <div class="step-description">Following the successful class enrollment script trigger, the system builds an automated account combination for the learner to access their personal tracking portal.</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <div id="enrollment-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Enrollment Information Input Screen</h3>
+                <button type="button" class="click-link" onclick="toggleModal('enrollment-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
+            </div>
+            
+            <form onsubmit="event.preventDefault();">
+                <div class="form-grid">
+                    <div class="form-group"><label>First Name</label><input type="text" value="Juan"></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" value="Dela Cruz"></div>
+                    <div class="form-group"><label>Birth Date</label><input type="date" value="2005-06-15"></div>
+                    <div class="form-group"><label>Unique Learner Identifier (ULI)</label><input type="text" value="ULI-9984-1254-A"></div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; display: block; margin-bottom: 6px;">Physical Document Checklist Requirements</span>
+                    <div class="checklist-group">
+                        <label class="checklist-item"><input type="checkbox" checked> Original Birth Certificate (PSA)</label>
+                        <label class="checklist-item"><input type="checkbox" checked> Academic Transcript / Form 137</label>
+                        <label class="checklist-item"><input type="checkbox"> Valid Government Identification Card</label>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; border-top: 1px solid var(--border-muted); padding-top: 15px;">
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; display: block; margin-bottom: 6px;">Financial Processing (₱500.00 Admission Fee)</span>
+                    <label class="checklist-item" style="font-weight: 600; color: var(--navy-dark);"><input type="checkbox" id="pay-check"> Confirm Window Cash Payment Received</label>
+                </div>
+
+                <button type="button" class="action-btn" onclick="saveEnrollmentFields()">Commit Profile Variables</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="scheduling-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Program Allocation & Scheduling Screen</h3>
+                <button type="button" class="click-link" onclick="toggleModal('scheduling-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
+            </div>
+            
+            <form onsubmit="event.preventDefault();">
+                <div class="form-group">
+                    <label>Target Qualification Program</label>
+                    <select id="program-select">
+                        <option value="TESDA">Computer Systems Servicing NC II (TESDA Certified Program)</option>
+                        <option value="MIS">Short-Term Industry Automation Workshop (Unregistered Institutional Course)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Allocated Training Timetable Cohort Block</label>
+                    <select>
+                        <option>CSS-NC2-2026A (Mon-Fri 8:00 AM - 12:00 PM)</option>
+                        <option>CSS-NC2-2026B (Mon-Fri 1:00 PM - 5:00 PM)</option>
+                    </select>
+                </div>
+
+                <div class="step-callout callout-warning">
+                    <strong>Unified Database Architecture Notice:</strong> <br>
+                    • If the student selects a <code>TESDA</code> track, routing rows append data directly to the national <code>T2MIS</code> registry tracking parameters.<br>
+                    • If an unregistered/institutional workshop track is chosen, records map strictly into the localized school <code>MIS</code> storage indices.<br>
+                    • Regardless of selection, all profiles sync back to a <strong>single unified database instance layer</strong> to eliminate data replication.
+                </div>
+
+                <button type="button" class="action-btn" onclick="executeFinalEnrollmentTrigger()">Trigger Final Class Onboarding</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        function toggleModal(modalId, isVisible) {
+            const targetModal = document.getElementById(modalId);
+            if (isVisible) {
+                targetModal.classList.add('active');
+            } else {
+                targetModal.classList.remove('active');
+            }
+        }
+
+        function saveEnrollmentFields() {
+            const paid = document.getElementById('pay-check').checked;
+            if (paid) {
+                alert("Student profile variables saved. Financial ledger state variable toggled to [CLEARED]. Proceed to class scheduling.");
+                toggleModal('enrollment-modal', false);
+            } else {
+                alert("Please confirm receipt of window cash payment before setting profile clearance parameters.");
+            }
+        }
+
+        function executeFinalEnrollmentTrigger() {
+            const choice = document.getElementById('program-select').value;
+            let registryTarget = (choice === "TESDA") ? "T2MIS Sub-Registry" : "Localized MIS Sub-Registry";
+            
+            alert(`Onboarding transaction saved! Data cleanly piped to ${registryTarget} inside the unified database platform layer.\n\n[SYSTEM NOTIFICATION TRIGGERED]: Automated user credentials generated and transmitted for student portal access login.`);
+            toggleModal('scheduling-modal', false);
+        }
+    </script>
+</body>
+</html>

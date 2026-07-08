@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dropout Processing Loop</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1d4ed8;
+            --bg-light: #f8fafc;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+            --info-bg: #f0fdf4;
+            --info-border: #d1fae5;
+            --info-text: #15803d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); padding: 40px; min-height: 100vh; display: flex; justify-content: center; }
+
+        .container { width: 100%; max-width: 750px; background: white; padding: 40px; border-radius: 12px; border: 1px solid var(--border-muted); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+
+        .feature-meta { font-size: 11px; font-weight: 700; color: #dc2626; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .task-title { font-size: 22px; color: var(--navy-dark); font-weight: 700; margin-bottom: 30px; border-bottom: 2px solid var(--border-muted); padding-bottom: 12px; }
+        
+        /* Unified Continuous Vertical Stepper Engine */
+        .step-block { display: grid; grid-template-columns: 35px 1fr; gap: 15px; padding-bottom: 35px; position: relative; }
+        .step-block::after {
+            content: ''; position: absolute; left: 16px; top: 24px; bottom: -6px; width: 2px; background-color: var(--border-muted); z-index: 1;
+        }
+        .step-block:last-child::after { display: none; }
+        .step-block:last-child { padding-bottom: 5px; }
+
+        .step-number { 
+            font-size: 11px; font-weight: 700; color: #64748b; background: #e2e8f0;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; justify-self: center; z-index: 2; position: relative; border: 2px solid white;
+        }
+        .step-block.completed .step-number { background: #22c55e; color: white; border-color: #22c55e; }
+        .step-block.active .step-number { background: #dc2626; color: white; border-color: #dc2626; box-shadow: 0 0 0 3px #fee2e2; }
+        
+        .step-content { padding-top: 2px; }
+        .step-name { font-size: 14px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+        .step-description { font-size: 13px; color: #475569; line-height: 1.5; }
+        
+        /* Interactive Triggers */
+        .red-highlight-btn { background: #dc2626; color: white; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
+        .red-highlight-btn:hover { background: #b91c1c; }
+        .blue-highlight-btn { background: var(--accent-blue); color: white; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
+        .blue-highlight-btn:hover { background: var(--accent-blue-dark); }
+        .action-btn { background: #eab308; color: white; border: none; padding: 10px 14px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 15px; }
+        .action-btn:hover { background: #ca8a04; }
+        .click-link { color: var(--accent-blue); font-weight: 600; cursor: pointer; text-decoration: none; background: none; border: none; }
+
+        /* Popup Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 12px; width: 645px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-muted); }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid var(--border-muted); border-radius: 6px; font-size: 13px; color: var(--navy-dark); background: var(--bg-light); }
+        
+        .checklist-group { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .checklist-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); }
+        .checklist-item input { width: 16px; height: 16px; cursor: pointer; }
+
+        .step-callout { border-radius: 6px; padding: 12px; font-size: 12px; line-height: 1.5; margin-top: 10px; border: 1px solid var(--border-muted); }
+        .callout-warning { background-color: var(--warning-bg); border-color: var(--warning-border); color: var(--warning-text); }
+        .callout-info { background-color: var(--info-bg); border-color: var(--info-border); color: var(--info-text); }
+        
+        /* Queue Table Components */
+        .queue-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .queue-table th { background: #f1f5f9; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; padding: 8px 12px; text-align: left; }
+        .queue-table td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--border-muted); color: var(--text-main); }
+
+        .status-badge { display: inline-block; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 4px; text-transform: uppercase; }
+        .badge-absence { background: #fee2e2; color: #991b1b; }
+        .badge-walkin { background: #e0f2fe; color: #0369a1; }
+
+        code { background-color: #e2e8f0; padding: 1px 4px; border-radius: 4px; font-family: monospace; font-size: 11.5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="feature-meta">Trainee Exit Lifecycle</div>
+        <div class="task-title">Student Dropout Process</div>
+
+        <main class="stepper-pane">
+            
+            <div class="step-block completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Receive Ingress Signal or Capture Manual Overrides</div>
+                    <div class="step-description">
+                        Profiles populate the entry queue from automated absence cutoffs, trainer inputs, or when a registrar accepts a walk-in upfront notice directly. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('manual-ingress-modal', true)">Create Manual Dropout Entry (Walk-In)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block completed">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Review Dropout Queues</div>
+                    <div class="step-description">
+                        Open the data hub table below to examine active records and monitor the ingress origins. <br>
+                        <button type="button" class="red-highlight-btn" onclick="toggleModal('queue-modal', true)">Open Pending Dropouts Registry</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block active">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Execute Asset Recovery Checklist</div>
+                    <div class="step-description">
+                        Trainees are strictly required to give back their institutional equipment sets. Open the recovery panel box to track asset item returns. <br>
+                        <button type="button" class="red-highlight-btn" onclick="toggleModal('recovery-modal', true)">Open Physical Return Checklist Screen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-name">Commit Database State Change</div>
+                    <div class="step-description">Clicking the dropout validation terminal button commits an atomic row flag change to update the centralized PostgreSQL index and reallocate training class slot balances automatically.</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <div id="manual-ingress-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Manual Dropout Initiation (Upfront Notice)</h3>
+                <button type="button" class="click-link" onclick="toggleModal('manual-ingress-modal', false)" style="font-size: 20px; line-height: 1; color: var(--accent-blue);">&times;</button>
+            </div>
+            <form onsubmit="event.preventDefault();">
+                <div class="form-group">
+                    <label>Search Active Student Name or ULI String</label>
+                    <select id="walkin-student-select">
+                        <option value="Pedro Santos">Pedro Santos (ULI-2026-1142 - Enrolled CSS)</option>
+                        <option value="Grace Ramos">Grace Ramos (ULI-2026-8849 - Enrolled VGD)</option>
+                    </select>
+                </div>
+                <div class="step-callout callout-info" style="margin-top: 5px; margin-bottom: 15px;">
+                    <strong>Manual Override:</strong> Hitting initiate forces a database write query. This moves their state code to <code>DROPOUT_PENDING</code> and adds them to the registry queue with a walk-in marker without needing trainer system flags.
+                </div>
+                <button type="button" class="action-btn" style="background: var(--accent-blue);" onclick="submitManualWalkIn()">Initiate Walk-In Exit Action</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="queue-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Pending Drops Audit Directory</h3>
+                <button type="button" class="click-link" onclick="toggleModal('queue-modal', false)" style="font-size: 20px; line-height: 1; color: #dc2626;">&times;</button>
+            </div>
+            
+            <p style="font-size: 12.5px; color: #64748b; margin-bottom: 15px;">Review incoming trainee exit triggers captured across the application instance layer before initializing uniform/ID collection routines.</p>
+
+            <table class="queue-table">
+                <thead>
+                    <tr>
+                        <th>Learner Target</th>
+                        <th>Course Block</th>
+                        <th>Trigger Ingress Source</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="queue-table-body">
+                    <tr>
+                        <td><strong>Alex Ramos</strong></td>
+                        <td><code>CSS-NC2-2026A</code></td>
+                        <td><span class="status-badge badge-absence">Long Absence (Trainer Flag)</span></td>
+                        <td><button type="button" class="click-link" onclick="loadStudentExit('Alex Ramos', 'Long Absence')">Process Return</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="recovery-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Asset Return Checklist Control Panel</h3>
+                <button type="button" class="click-link" onclick="toggleModal('recovery-modal', false)" style="font-size: 20px; line-height: 1; color: #dc2626;">&times;</button>
+            </div>
+            
+            <form onsubmit="event.preventDefault();">
+                <div class="form-group">
+                    <label>Active Trainee Profile Context</label>
+                    <input type="text" id="exit-student-display" value="Alex Ramos" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Current Captured Source Tracker</label>
+                    <input type="text" id="exit-source-display" value="Long Absence" disabled style="font-weight: bold; color: #dc2626;">
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; display: block; margin-bottom: 6px;">Physical Inventory Recovery Criteria</span>
+                    <div class="checklist-group">
+                        <label class="checklist-item"><input type="checkbox" id="ret-uniform"> Type-A Regulation Uniform Set Returned</label>
+                        <label class="checklist-item"><input type="checkbox" id="ret-id"> Institutional ID Card Deactivated & Handed In</label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Set Structural Indicator Dropout Code</label>
+                    <select id="indicator-select">
+                        <option value="DROPOUT">DROPOUT (Unresolved Program Exit)</option>
+                    </select>
+                </div>
+
+                <div class="step-callout callout-warning">
+                    <strong>System Integrity Data Constraint Anchor:</strong> <br>
+                    The transactional engine prohibits final exit commits unless all physical properties are safely checked off. Any unresolved inventory drift halts row processing to ensure physical kit reconciliation accountability.
+                </div>
+
+                <button type="button" class="action-btn" onclick="commitStudentExitAction()">
+                    Click Validation Button to Update Database Row
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        function toggleModal(modalId, isVisible) {
+            const targetModal = document.getElementById(modalId);
+            if (isVisible) {
+                targetModal.classList.add('active');
+            } else {
+                targetModal.classList.remove('active');
+            }
+        }
+
+        function submitManualWalkIn() {
+            const student = document.getElementById('walkin-student-select').value;
+            
+            const tableBody = document.getElementById('queue-table-body');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><strong>${student}</strong></td>
+                <td><code>CSS-NC2-2026A</code></td>
+                <td><span class="status-badge badge-walkin">📄 Upfront Walk-In Notice</span></td>
+                <td><button type="button" class="click-link" onclick="loadStudentExit('${student}', '📄 Upfront Walk-In Notice')">Process Return</button></td>
+            `;
+            tableBody.appendChild(newRow);
+
+            alert(`Profile forced to status [DROPOUT_PENDING].\n\nTarget student: ${student} has been cleanly appended into the active dropout queue registry under manual entry tracking.`);
+            toggleModal('manual-ingress-modal', false);
+        }
+
+        function loadStudentExit(studentName, sourceName) {
+            document.getElementById('exit-student-display').value = studentName;
+            document.getElementById('exit-source-display').value = sourceName;
+            toggleModal('queue-modal', false);
+            toggleModal('recovery-modal', true);
+        }
+
+        function commitStudentExitAction() {
+            const uniformReturned = document.getElementById('ret-uniform').checked;
+            const idReturned = document.getElementById('ret-id').checked;
+            const targetName = document.getElementById('exit-student-display').value;
+
+            if (uniformReturned && idReturned) {
+                alert(`Atomic data statement processed successfully!\n\nPostgreSQL row parameters saved for target student: ${targetName}.\nStatus Indicator Code committed as: DROPOUT_ARCHIVED.\n\n[SYSTEM NOTIFICATION]: Active classroom structural seating allocations calculated and adjusted cleanly.`);
+                toggleModal('recovery-modal', false);
+            } else {
+                alert("Operation Denied: Missing inventory assets. Please confirm physical handover check-offs for both uniform and ID card parameters before authorizing database drops.");
+            }
+        }
+    </script>
+</body>
+</html>
