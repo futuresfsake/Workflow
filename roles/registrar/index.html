@@ -1,100 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCCTEST Portal - Registrar Intake Hub</title>
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --navy-dark: #0f172a;
-            --bg-light: #f8fafc;
-            --border: #cbd5e1;
-            --text: #334155;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
-        
-        .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; text-align: center; }
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-        .nav-item { padding: 10px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; font-weight: 500; }
-        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
-        .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
-        
-        .main-content { flex: 1; padding: 35px; overflow-y: auto; }
-        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 24px; color: var(--navy-dark); }
-        .role-tag { background-color: #e0e7ff; color: var(--primary-blue); font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; }
-        
-        .card { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
-        
-        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 12px; font-weight: 600; color: #475569; }
-        .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background-color: var(--bg-light); }
-        .btn { padding: 10px 20px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background-color: var(--primary); color: white; }
-        .btn:hover { background-color: var(--primary-dark); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCCTEST Portal - Online Admission Application (Annotated Mockup)</title>
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-soft: #e0e7ff;
+        --navy-dark: #0f172a;
+        --bg-light: #f8fafc;
+        --border: #cbd5e1;
+        --border-muted: #e2e8f0;
+        --text: #334155;
+        --text-soft: #64748b;
+        --success: #059669;
+        --success-soft: #d1fae5;
+        --warning: #d97706;
+        --warning-soft: #fef3c7;
+        /* fixes two undefined vars found in the original registrar module file */
+        --primary-blue: var(--primary);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
+
+    /* ---------- sidebar (same shell as Registrar module) ---------- */
+    .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; position: sticky; top: 0; height: 100vh; }
+    .sidebar h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; text-align: center; }
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+    .nav-item { padding: 10px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; font-weight: 500; display: block; }
+    .nav-item .n { font-family: monospace; color: #64748b; margin-right: 6px; }
+    .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
+    .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
+
+    /* ---------- main content ---------- */
+    .main-content { flex: 1; padding: 35px; overflow-y: auto; }
+    .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .header h1 { font-size: 24px; color: var(--navy-dark); }
+    .header p.sub { font-size: 13px; color: var(--text-soft); margin-top: 4px; max-width: 560px; }
+    .role-tag { background-color: var(--primary-soft); color: var(--primary-blue); font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+
+    .card { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+
+    .screen-block { margin-bottom: 46px; }
+    .screen-tag { display: inline-block; background: var(--navy-dark); color: white; font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 4px 10px; border-radius: 4px; margin-bottom: 8px; }
+    .screen-caption { font-size: 13px; color: var(--text-soft); margin: 4px 0 16px; max-width: 640px; line-height: 1.6; }
+    .screen-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; align-items: start; }
+    @media (max-width: 900px) { .screen-layout { grid-template-columns: 1fr; } }
+
+    /* ---------- form atoms (reused from Registrar module) ---------- */
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; }
+    .form-grid.single { grid-template-columns: 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px; }
+    .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background-color: var(--bg-light); color: var(--text-soft); }
+    .btn { padding: 10px 20px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: default; background-color: var(--primary); color: white; display: inline-flex; align-items: center; gap: 8px; }
+    .btn.disabled { background-color: #c7c9f5; }
+    .btn-ghost { padding: 10px 20px; font-size: 13px; font-weight: 600; border: 1px solid var(--border); border-radius: 6px; background: white; color: var(--text-soft); }
+    .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border); }
+
+    /* stepper as pill tabs */
+    .pill-stepper { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+    .pill { font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 20px; background: var(--bg-light); color: var(--text-soft); border: 1px solid var(--border-muted); }
+    .pill.done { background: var(--success-soft); color: var(--success); border-color: var(--success-soft); }
+    .pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .pill.locked { border-style: dashed; opacity: .65; }
+
+    /* toggle */
+    .toggle-group { display: flex; gap: 8px; }
+    .toggle-opt { flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 9px; text-align: center; font-size: 12.5px; background: var(--bg-light); color: var(--text-soft); }
+    .toggle-opt.on { border-color: var(--primary); background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+
+    /* option cards (program / schedule) */
+    .group-title { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--primary-dark); margin: 16px 0 8px; display: flex; align-items: center; gap: 8px; }
+    .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 500px) { .opt-grid { grid-template-columns: 1fr; } }
+    .opt-card { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-light); padding: 11px 13px; display: flex; gap: 9px; align-items: flex-start; }
+    .opt-card .mark { width: 14px; height: 14px; border: 2px solid var(--border); border-radius: 4px; flex: 0 0 auto; margin-top: 2px; }
+    .opt-card.radio .mark { border-radius: 50%; }
+    .opt-card.sel { border-color: var(--primary); background: var(--primary-soft); }
+    .opt-card.sel .mark { background: var(--primary); border-color: var(--primary-dark); }
+    .opt-card .t { font-size: 12.5px; font-weight: 600; color: var(--navy-dark); }
+    .opt-card .d { font-size: 10.5px; color: var(--text-soft); margin-top: 1px; }
+
+    /* documents */
+    .doc-row { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-light); padding: 11px; display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+    .doc-row.done { border-color: var(--success-soft); background: var(--success-soft); }
+    .doc-thumb { width: 38px; height: 38px; border: 1px dashed var(--border); border-radius: 6px; background: white; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-soft); }
+    .doc-row.done .doc-thumb { border-style: solid; border-color: var(--success); color: var(--success); }
+    .doc-meta { flex: 1; min-width: 0; }
+    .doc-meta .t { font-size: 12.5px; font-weight: 600; color: var(--navy-dark); }
+    .doc-meta .d { font-size: 10.5px; color: var(--text-soft); }
+    .doc-btn { font-size: 10.5px; font-weight: 700; background: var(--primary); color: white; padding: 6px 10px; border-radius: 6px; white-space: nowrap; }
+    .doc-row.done .doc-btn { background: white; color: var(--success); border: 1px solid var(--success); }
+    .progress-bar { height: 6px; background: var(--border-muted); border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
+    .progress-fill { height: 100%; background: var(--primary); width: 50%; }
+
+    /* review */
+    .review-block { border: 1px solid var(--border-muted); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; background: var(--bg-light); }
+    .review-block h4 { margin: 0 0 6px; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--primary-dark); }
+    .review-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border-muted); }
+    .review-row:last-child { border-bottom: none; }
+    .review-row .k { color: var(--text-soft); }
+    .review-row .v { font-weight: 600; color: var(--navy-dark); }
+
+    /* modal */
+    .modal-overlay { background: rgba(15,23,42,.55); border-radius: 8px; padding: 30px 16px; display: flex; align-items: center; justify-content: center; }
+    .modal-box { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 22px 20px; text-align: center; max-width: 280px; box-shadow: 0 10px 24px -10px rgba(15,23,42,.35); }
+    .modal-box .ic { width: 40px; height: 40px; border-radius: 50%; background: var(--success-soft); color: var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-weight: 700; }
+    .modal-box h4 { font-size: 17px; color: var(--navy-dark); margin: 0 0 6px; }
+    .modal-box p { font-size: 11.5px; color: var(--text-soft); line-height: 1.55; margin: 0 0 14px; }
+
+    /* status screen */
+    .status-badge { display: inline-flex; align-items: center; gap: 7px; background: var(--warning-soft); color: var(--warning); font-weight: 700; font-size: 11px; letter-spacing: .03em; text-transform: uppercase; padding: 6px 12px; border-radius: 20px; margin-bottom: 14px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warning); }
+    .next-list { list-style: none; margin: 0 0 14px; padding: 0; }
+    .next-list li { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border-muted); align-items: flex-start; }
+    .next-list li:last-child { border-bottom: none; }
+    .num-badge { width: 20px; height: 20px; border-radius: 50%; background: var(--primary-soft); color: var(--primary-dark); font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+    .next-list .t { font-size: 12.5px; font-weight: 600; color: var(--navy-dark); }
+    .next-list .d { font-size: 11px; color: var(--text-soft); margin-top: 2px; line-height: 1.5; }
+    .bring-box { background: var(--primary-soft); border-radius: 8px; padding: 12px 14px; font-size: 11px; color: var(--navy-dark); }
+    .bring-box b { display: block; margin-bottom: 5px; font-size: 10px; letter-spacing: .04em; text-transform: uppercase; color: var(--primary-dark); }
+    .bring-box ul { margin: 0; padding-left: 16px; line-height: 1.7; }
+
+    /* legend card */
+    .legend-title { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 12px; }
+    .legend-item { display: flex; gap: 10px; margin-bottom: 14px; }
+    .legend-item:last-child { margin-bottom: 0; }
+    .legend-item .t { font-size: 13px; font-weight: 700; color: var(--navy-dark); margin: 0 0 3px; }
+    .legend-item .d { font-size: 12px; color: var(--text-soft); line-height: 1.55; margin: 0; }
+
+    .chip { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border-radius: 50%; background: var(--primary); color: white; font-size: 9.5px; font-weight: 700; flex: 0 0 auto; }
+    .chip.alt { background: var(--navy-dark); }
+    .chip.sm { width: 14px; height: 14px; font-size: 8px; }
+
+    .note-strip { background: var(--navy-dark); color: #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 11.5px; line-height: 1.6; margin-top: 14px; }
+    .note-strip b { color: #fbbf24; }
+</style>
 </head>
 <body>
     <div class="sidebar">
         <div>
-            <h2>MCC Registrar</h2>
+            <h2>Admission Steps</h2>
             <nav class="nav-links">
-                <a href="#" class="nav-item active">Online Admission Intake</a>
-                <a href="#" class="nav-item">Course Batch Rosters</a>
-                <a href="#" class="nav-item">DPA Compliance Vault</a>
-                <a href="#" class="nav-item">Terminal Audit Reports</a>
+                <a href="#s1" class="nav-item"><span class="n">01</span>Applicant Info</a>
+                <a href="#s2" class="nav-item"><span class="n">02</span>Program</a>
+                <a href="#s3" class="nav-item"><span class="n">03</span>Schedule</a>
+                <a href="#s4" class="nav-item"><span class="n">04</span>Documents</a>
+                <a href="#s5" class="nav-item"><span class="n">05</span>Review</a>
+                <a href="#s6" class="nav-item"><span class="n">06</span>Confirmation</a>
+                <a href="#s7" class="nav-item"><span class="n">07</span>Next Steps</a>
             </nav>
         </div>
-        <a href="../../index.html" class="nav-item back-btn">➔ Back to Portal Gateway</a>
+        <a href="#" class="nav-item back-btn">➔ Back to Portal Gateway</a>
     </div>
+
     <div class="main-content">
         <div class="header">
             <div>
-                <h1>Online Student Intake & Registration Management</h1>
-                <p style="font-size: 13px; color: #64748b;">Processing applicant fields mapped straight to standard TESDA Form NMIS-01 requirements.</p>
+                <h1>Online Admission Application</h1>
+                <p class="sub">Annotated screen-by-screen mockup of the trainee/student side of enrollment — from the online form to what happens once they walk in for on-site verification.</p>
             </div>
-            <span class="role-tag">Registrar Office Module</span>
+            <span class="role-tag">Applicant / Trainee Module</span>
         </div>
-        
-        <div class="card">
-            <h3>Trainee Enrollment Form Sheets</h3>
-            <form onsubmit="event.preventDefault(); alert('Trainee field layout validated against active constraints and saved successfully.');">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>TESDA Unique Learner Identifier (14-Digit ULI)</label>
-                        <input type="text" placeholder="e.g., ULI-90-XYZ-87611" required>
+
+        <!-- SCREEN 1 -->
+        <div class="screen-block" id="s1">
+            <span class="screen-tag">SCREEN 01</span>
+            <div class="screen-layout">
+                <div class="card">
+                    <h3><span class="chip">1</span>Applicant Information</h3>
+                    <div class="pill-stepper">
+                        <span class="pill active">1 Info</span><span class="pill">2 Program</span><span class="pill">3 Schedule</span><span class="pill">4 Documents</span><span class="pill">5 Review</span>
                     </div>
-                    <div class="form-group">
-                        <label>Full Legal Name</label>
-                        <input type="text" placeholder="Last Name, First Name, Middle Initial" required>
+                    <div class="form-grid single">
+                        <div class="form-group"><label><span class="chip sm">2</span>Full Name</label><input type="text" value="Juan D. Dela Cruz" disabled></div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group"><label><span class="chip sm">3</span>Contact Number</label><input type="text" value="0917 123 4567" disabled></div>
+                        <div class="form-group"><label>Email (optional)</label><input type="text" value="juan@email.com" disabled></div>
+                    </div>
+                    <div class="form-grid single">
+                        <div class="form-group"><label>Barangay / Address</label><input type="text" value="Barangay Tabok, Mandaue City" disabled></div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:15px;">
+                        <label><span class="chip sm">4</span>Are you a resident of Mandaue City?</label>
+                        <div class="toggle-group"><span class="toggle-opt on">Yes</span><span class="toggle-opt">No</span></div>
+                    </div>
+                    <div class="nav-row">
+                        <span class="btn-ghost" style="visibility:hidden;">Back</span>
+                        <span class="btn"><span class="chip alt sm">5</span>Continue</span>
                     </div>
                 </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Target Course Specialization Roster</label>
-                        <select required>
-                            <option value="">-- Choose Mandated Allocation Block --</option>
-                            <option>Computer Systems Servicing NC II</option>
-                            <option>Shielded Metal Arc Welding (SMAW) NC I</option>
-                        </select>
+                <div class="card">
+                    <p class="legend-title">What each part does</p>
+                    <div class="legend-item"><span class="chip">1</span><div><p class="t">Screen title</p><p class="d">Tells the applicant which step they're on, matching the pill stepper underneath.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">2</span><div><p class="t">Full Name</p><p class="d">Should match the Birth Certificate/PSA copy — this is what the Registrar checks against on-site.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">3</span><div><p class="t">Contact Number</p><p class="d">Used to notify the applicant when their batch starts (currently done via Facebook post or text).</p></div></div>
+                    <div class="legend-item"><span class="chip sm">4</span><div><p class="t">Mandaue Residency toggle</p><p class="d">Selecting "No" flags the record so the Registrar can confirm the applicable tuition fee in person.</p></div></div>
+                    <div class="legend-item"><span class="chip alt sm">5</span><div><p class="t">Continue button</p><p class="d">Disabled until Name, Contact, Barangay, and the residency toggle are all filled in.</p></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2 -->
+        <div class="screen-block" id="s2">
+            <span class="screen-tag">SCREEN 02</span>
+            <div class="screen-layout">
+                <div class="card">
+                    <h3>Select Your Program</h3>
+                    <div class="pill-stepper">
+                        <span class="pill done">✓ Info</span><span class="pill active">2 Program</span><span class="pill">3 Schedule</span><span class="pill">4 Documents</span><span class="pill">5 Review</span>
                     </div>
-                    <div class="form-group">
-                        <label>Data Privacy Release Status (Mandatory Compliance Check)</label>
-                        <select required>
-                            <option value="">-- Verify Signed Release Verification --</option>
-                            <option>DPA Consent Completed & Archived</option>
-                            <option>Parental/Guardian Form Checked Out (Minor Exception)</option>
-                        </select>
+                    <div class="group-title"><span class="chip sm">1</span>NC2-Accredited (choose one)</div>
+                    <div class="opt-grid">
+                        <div class="opt-card radio sel"><div class="mark"></div><div><div class="t">Hilot NC2</div><div class="d">TESDA-registered</div></div></div>
+                        <div class="opt-card radio"><div class="mark"></div><div><div class="t">EIM NC2</div><div class="d">TESDA-registered</div></div></div>
+                    </div>
+                    <div class="group-title" style="margin-top:16px;"><span class="chip sm">2</span>Community-Based (optional)</div>
+                    <div class="opt-grid">
+                        <div class="opt-card sel"><div class="mark"></div><div><div class="t">Cookery</div><div class="d">Non-registered short program</div></div></div>
+                        <div class="opt-card"><div class="mark"></div><div><div class="t">Dressmaking</div><div class="d">Non-registered short program</div></div></div>
+                    </div>
+                    <div class="nav-row">
+                        <span class="btn-ghost">Back</span>
+                        <span class="btn"><span class="chip alt sm">3</span>Continue</span>
                     </div>
                 </div>
-                <button type="submit" class="btn">Verify & Lock Enrollment Roster</button>
-            </form>
+                <div class="card">
+                    <p class="legend-title">What each part does</p>
+                    <div class="legend-item"><span class="chip sm">1</span><div><p class="t">NC2 group — single-select</p><p class="d">Radio behavior: choosing a second NC2 card deselects the first.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">2</span><div><p class="t">Community group — optional</p><p class="d">Selecting one alongside an NC2 program is the only allowed 2-program combination, per the interview notes.</p></div></div>
+                    <div class="legend-item"><span class="chip alt sm">3</span><div><p class="t">Continue button</p><p class="d">Enabled once exactly one NC2 program is selected.</p></div></div>
+                    <div class="note-strip"><b>Open item:</b> full list of the 16 community-based programs is still pending from the Owner/Admin — placeholders shown here.</div>
+                </div>
+            </div>
         </div>
+
+        <!-- SCREEN 3 -->
+        <div class="screen-block" id="s3">
+            <span class="screen-tag">SCREEN 03</span>
+            <div class="screen-layout">
+                <div class="card">
+                    <h3><span class="chip">1</span>Select a Schedule</h3>
+                    <div class="pill-stepper">
+                        <span class="pill done">✓ Info</span><span class="pill done">✓ Program</span><span class="pill active">3 Schedule</span><span class="pill">4 Documents</span><span class="pill">5 Review</span>
+                    </div>
+                    <div class="opt-grid">
+                        <div class="opt-card radio"><div class="mark"></div><div><div class="t">Morning Batch</div><div class="d">Starts once minimum enrollees are reached</div></div></div>
+                        <div class="opt-card radio sel"><div class="mark"></div><div><div class="t">Evening Batch</div><div class="d"><span class="chip sm">2</span> Fills faster — usually starts sooner</div></div></div>
+                    </div>
+                    <div class="nav-row"><span class="btn-ghost">Back</span><span class="btn">Continue</span></div>
+                </div>
+                <div class="card">
+                    <p class="legend-title">What each part does</p>
+                    <div class="legend-item"><span class="chip">1</span><div><p class="t">Schedule options</p><p class="d">A preference only — no exact date is promised, since batch start depends on headcount (10–20 minimum, 20 max) and the Trainer's call.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">2</span><div><p class="t">Helper note per card</p><p class="d">Sets honest expectations — evening batches historically fill faster.</p></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4 -->
+        <div class="screen-block" id="s4">
+            <span class="screen-tag">SCREEN 04</span>
+            <div class="screen-layout">
+                <div class="card">
+                    <h3><span class="chip">1</span>Upload Requirement Photos</h3>
+                    <div class="pill-stepper">
+                        <span class="pill done">✓ Info</span><span class="pill done">✓ Program</span><span class="pill done">✓ Schedule</span><span class="pill active">4 Documents</span><span class="pill">5 Review</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                    <div class="doc-row done">
+                        <div class="doc-thumb">✓</div>
+                        <div class="doc-meta"><div class="t">Birth Certificate (PSA/NSO)</div><div class="d"><span class="chip alt sm">2</span> Uploaded</div></div>
+                        <div class="doc-btn">Replace</div>
+                    </div>
+                    <div class="doc-row">
+                        <div class="doc-thumb">＋</div>
+                        <div class="doc-meta"><div class="t">Barangay Clearance</div><div class="d">Not uploaded yet</div></div>
+                        <div class="doc-btn"><span class="chip sm">3</span> Upload photo</div>
+                    </div>
+                    <div class="doc-row">
+                        <div class="doc-thumb">＋</div>
+                        <div class="doc-meta"><div class="t">Cedula</div><div class="d">Not uploaded yet</div></div>
+                        <div class="doc-btn">Upload photo</div>
+                    </div>
+                    <div class="nav-row"><span class="btn-ghost">Back</span><span class="btn disabled">Continue</span></div>
+                </div>
+                <div class="card">
+                    <p class="legend-title">What each part does</p>
+                    <div class="legend-item"><span class="chip">1</span><div><p class="t">Progress bar</p><p class="d">Fills as each of the 4 required documents gets a photo attached.</p></div></div>
+                    <div class="legend-item"><span class="chip alt sm">2</span><div><p class="t">Completed document row</p><p class="d">Thumbnail + status confirm the upload; "Replace" lets them retake a blurry photo.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">3</span><div><p class="t">Upload photo button</p><p class="d">Opens the phone's camera directly (or file picker on desktop).</p></div></div>
+                    <div class="note-strip">These photos are for <b>pre-screening only</b> — the applicant still brings physical originals on-site; this doesn't replace that step.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5 -->
+        <div class="screen-block" id="s5">
+            <span class="screen-tag">SCREEN 05</span>
+            <div class="screen-layout">
+                <div class="card">
+                    <h3><span class="chip">1</span>Review Your Application</h3>
+                    <div class="pill-stepper">
+                        <span class="pill done">✓ Info</span><span class="pill done">✓ Program</span><span class="pill done">✓ Schedule</span><span class="pill done">✓ Documents</span><span class="pill active">5 Review</span>
+                    </div>
+                    <div class="review-block">
+                        <h4>Applicant</h4>
+                        <div class="review-row"><span class="k">Name</span><span class="v">Juan D. Dela Cruz</span></div>
+                        <div class="review-row"><span class="k">Mandaue resident</span><span class="v">Yes</span></div>
+                    </div>
+                    <div class="review-block">
+                        <h4>Program & Schedule</h4>
+                        <div class="review-row"><span class="k">NC2 Program</span><span class="v">Hilot NC2</span></div>
+                        <div class="review-row"><span class="k">Schedule</span><span class="v">Evening Batch</span></div>
+                    </div>
+                    <div class="nav-row"><span class="btn-ghost">Back</span><span class="btn"><span class="chip alt sm">2</span>Submit Application</span></div>
+                </div>
+                <div class="card">
+                    <p class="legend-title">What each part does</p>
+                    <div class="legend-item"><span class="chip">1</span><div><p class="t">Read-only summary blocks</p><p class="d">Grouped by section. Nothing is editable directly — the applicant taps "Back" to fix anything.</p></div></div>
+                    <div class="legend-item"><span class="chip alt sm">2</span><div><p class="t">Submit Application</p><p class="d">Sends the record to the Registrar's queue and triggers the confirmation on the next screen — the last interactive step in the flow.</p></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 6 -->
+        <div class="screen-block" id="s6">
+            <span class="screen-tag">SCREEN 06</span>
+            <div class="screen-layout">
+                <div class="card">
+                    <h3>Confirmation Modal</h3>
+                    <div class="modal-overlay">
+                        <div class="modal-box">
+                            <div class="ic"><span class="chip alt">1</span></div>
+                            <h4><span class="chip sm">2</span> Application received</h4>
+                            <p><span class="chip sm">3</span> Thank you for applying to MCCTEST. Our Registrar will review your submitted details and photos before your on-site visit — you'll bring the originals in person to complete verification.</p>
+                            <span class="btn" style="display:block; justify-content:center;"><span class="chip alt sm">4</span>Got it — what's next?</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <p class="legend-title">What each part does</p>
+                    <div class="legend-item"><span class="chip alt sm">1</span><div><p class="t">Checkmark icon</p><p class="d">Visual confirmation the submission went through.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">2</span><div><p class="t">Headline</p><p class="d">Neutral tone — the applicant isn't enrolled yet.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">3</span><div><p class="t">Body copy</p><p class="d">Explicitly names the Registrar and the on-site step so nothing is assumed.</p></div></div>
+                    <div class="legend-item"><span class="chip alt sm">4</span><div><p class="t">Dismiss button</p><p class="d">Closes the modal and moves to the Next Steps screen.</p></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 7 -->
+        <div class="screen-block" id="s7">
+            <span class="screen-tag">SCREEN 07</span>
+            <div class="screen-layout">
+                <div class="card">
+                    <h3>Next Steps (Post-Submission)</h3>
+                    <div class="pill-stepper">
+                        <span class="pill done">✓ Info</span><span class="pill done">✓ Program</span><span class="pill done">✓ Schedule</span><span class="pill done">✓ Documents</span><span class="pill done">✓ Review</span><span class="pill locked">6 On-Site</span><span class="pill locked">7 Enrolled</span>
+                    </div>
+                    <div class="status-badge"><span class="status-dot"></span><span class="chip alt sm">1</span>Pending On-Site Verification</div>
+                    <ul class="next-list">
+                        <li><div class="num-badge"><span class="chip sm">2</span></div><div><div class="t">Bring your original documents on-site</div><div class="d">Visit MCCTEST with the physical originals of everything you photographed, plus the ₱500 ID & uniform fee.</div></div></li>
+                        <li><div class="num-badge">2</div><div><div class="t">Registrar verifies your documents face-to-face</div><div class="d">Originals are checked against what you submitted, then your enrollment record is finalized.</div></div></li>
+                        <li><div class="num-badge">3</div><div><div class="t">Your SkillTrack account unlocks</div><div class="d">Once verified, you can log in to view your schedule, attendance, and grades.</div></div></li>
+                    </ul>
+                    <div class="bring-box"><b><span class="chip sm">3</span> Bring with you</b><ul><li>Birth Certificate (original)</li><li>Barangay Clearance (original)</li><li>₱500 ID & uniform fee</li></ul></div>
+                </div>
+                <div class="card">
+                    <p class="legend-title">What each part does</p>
+                    <div class="legend-item"><span class="chip alt sm">1</span><div><p class="t">Status badge</p><p class="d">Signals this is still an open task — the applicant isn't fully enrolled until the on-site step happens.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">2</span><div><p class="t">3-step handoff list</p><p class="d">Step 1 is the applicant's action; steps 2–3 are things staff do while the applicant waits.</p></div></div>
+                    <div class="legend-item"><span class="chip sm">3</span><div><p class="t">"Bring with you" checklist</p><p class="d">Quick recap so the applicant doesn't scroll back to earlier screens.</p></div></div>
+                    <div class="legend-item"><div style="width:17px;"></div><div><p class="t">Locked pills 6–7</p><p class="d">Dashed/greyed to show these happen outside the app (staff verify in person, then finalize enrollment and unlock LMS access).</p></div></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </body>
 </html>

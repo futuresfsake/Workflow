@@ -1,92 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCCTEST Portal - Trainee Workspace</title>
-    <style>
-        :root {
-            --primary: #10b981;
-            --primary-dark: #047857;
-            --navy-dark: #0f172a;
-            --bg-light: #f8fafc;
-            --border: #cbd5e1;
-            --text: #334155;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
-        
-        .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; text-align: center; }
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-        .nav-item { padding: 10px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; font-weight: 500; }
-        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
-        .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
-        
-        .main-content { flex: 1; padding: 35px; overflow-y: auto; }
-        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 24px; color: var(--navy-dark); }
-        .role-tag { background-color: #d1fae5; color: var(--primary-dark); font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; }
-        
-        .card { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
-        
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background-color: var(--bg-light); border: 1px solid var(--border); padding: 15px; border-radius: 6px; text-align: center; }
-        .btn { padding: 10px 18px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background-color: var(--primary-blue); color: white; }
-        .btn-success { background-color: var(--success); color: white; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCCTEST Portal - Student / Trainee Module</title>
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-soft: #e0e7ff;
+        --navy-dark: #0f172a;
+        --bg-light: #f8fafc;
+        --border: #cbd5e1;
+        --border-muted: #e2e8f0;
+        --text: #334155;
+        --text-soft: #64748b;
+        --success: #059669;
+        --success-soft: #d1fae5;
+        --warning: #d97706;
+        --warning-soft: #fef3c7;
+        --primary-blue: var(--primary);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
+    li { margin-left: 20px;}
+
+    .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; position: sticky; top: 0; height: 100vh; flex: 0 0 auto; }
+    .sidebar h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; text-align: center; }
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+    .nav-item { padding: 10px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; font-weight: 500; border: none; background: none; text-align: left; width: 100%; display: block; }
+    .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
+    .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
+
+    .main-content { flex: 1; padding: 35px; overflow-y: auto; min-width: 0; }
+    .header { margin-bottom: 26px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .header h1 { font-size: 24px; color: var(--navy-dark); }
+    .header p.sub { font-size: 13px; color: var(--text-soft); margin-top: 4px; max-width: 560px; }
+    .role-tag { background-color: var(--primary-soft); color: var(--primary-blue); font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+
+    .card { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .status-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+    .status-left .label { font-size: 11px; color: var(--text-soft); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+    .status-left .value { font-size: 15px; font-weight: 700; color: var(--navy-dark); }
+    .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--warning-soft); color: var(--warning); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; padding: 6px 12px; border-radius: 20px; }
+    .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warning); }
+
+    .btn { padding: 10px 20px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background-color: var(--primary); color: white; }
+    .btn:hover { background-color: var(--primary-dark); }
+    .btn-ghost { padding: 10px 20px; font-size: 13px; font-weight: 600; border: 1px solid var(--border); border-radius: 6px; background: white; color: var(--text-soft); cursor: pointer; }
+
+    .placeholder-note { font-size: 13px; color: var(--text-soft); line-height: 1.7; }
+    .placeholder-note b { color: var(--navy-dark); }
+
+    /* ---------- Modal popup for detailed mockup ---------- */
+    .overlay { position: fixed; inset: 0; background: rgba(15,23,42,.6); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+    .overlay.open { display: flex; }
+    .popup { background: var(--bg-light); width: 100%; max-width: 980px; max-height: 90vh; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 50px -20px rgba(15,23,42,.5); }
+    .popup-head { background: var(--navy-dark); color: white; padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; flex: 0 0 auto; }
+    .popup-head h2 { font-size: 16px; }
+    .popup-head .close-x { background: rgba(255,255,255,.1); border: none; color: white; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 15px; }
+    .popup-pills { display: flex; gap: 6px; padding: 14px 22px; flex-wrap: wrap; border-bottom: 1px solid var(--border-muted); background: white; flex: 0 0 auto; }
+    .p-pill { font-size: 11px; font-weight: 600; padding: 6px 11px; border-radius: 20px; background: var(--bg-light); color: var(--text-soft); border: 1px solid var(--border-muted); cursor: pointer; }
+    .p-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .popup-body { padding: 22px; overflow-y: auto; flex: 1 1 auto; }
+    .popup-layout { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px; align-items: start; }
+    @media (max-width: 760px) { .popup-layout { grid-template-columns: 1fr; } }
+    .popup-caption { font-size: 12.5px; color: var(--text-soft); margin-bottom: 16px; line-height: 1.6; }
+    .popup-foot { padding: 14px 22px; border-top: 1px solid var(--border-muted); display: flex; justify-content: space-between; background: white; flex: 0 0 auto; }
+
+    /* mockup atoms (shared across popup steps) */
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; }
+    .form-grid.single { grid-template-columns: 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px; }
+    .form-group input { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background-color: var(--bg-light); color: var(--text-soft); }
+    .toggle-group { display: flex; gap: 8px; }
+    .toggle-opt { flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 9px; text-align: center; font-size: 12.5px; background: var(--bg-light); color: var(--text-soft); }
+    .toggle-opt.on { border-color: var(--primary); background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+    .group-title { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--primary-dark); margin: 16px 0 8px; }
+    .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 500px) { .opt-grid { grid-template-columns: 1fr; } }
+    .opt-card { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-light); padding: 11px 13px; display: flex; gap: 9px; align-items: flex-start; }
+    .opt-card .mark { width: 14px; height: 14px; border: 2px solid var(--border); border-radius: 4px; flex: 0 0 auto; margin-top: 2px; }
+    .opt-card.radio .mark { border-radius: 50%; }
+    .opt-card.sel { border-color: var(--primary); background: var(--primary-soft); }
+    .opt-card.sel .mark { background: var(--primary); border-color: var(--primary-dark); }
+    .opt-card .t { font-size: 12.5px; font-weight: 600; color: var(--navy-dark); }
+    .opt-card .d { font-size: 10.5px; color: var(--text-soft); margin-top: 1px; }
+    .doc-row { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-light); padding: 11px; display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+    .doc-row.done { border-color: var(--success-soft); background: var(--success-soft); }
+    .doc-thumb { width: 38px; height: 38px; border: 1px dashed var(--border); border-radius: 6px; background: white; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-soft); }
+    .doc-row.done .doc-thumb { border-style: solid; border-color: var(--success); color: var(--success); }
+    .doc-meta { flex: 1; min-width: 0; }
+    .doc-meta .t { font-size: 12.5px; font-weight: 600; color: var(--navy-dark); }
+    .doc-meta .d { font-size: 10.5px; color: var(--text-soft); }
+    .doc-btn { font-size: 10.5px; font-weight: 700; background: var(--primary); color: white; padding: 6px 10px; border-radius: 6px; white-space: nowrap; }
+    .doc-row.done .doc-btn { background: white; color: var(--success); border: 1px solid var(--success); }
+    .progress-bar { height: 6px; background: var(--border-muted); border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
+    .progress-fill { height: 100%; background: var(--primary); width: 50%; }
+    .review-block { border: 1px solid var(--border-muted); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; background: var(--bg-light); }
+    .review-block h4 { margin: 0 0 6px; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--primary-dark); }
+    .review-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border-muted); }
+    .review-row:last-child { border-bottom: none; }
+    .review-row .k { color: var(--text-soft); }
+    .review-row .v { font-weight: 600; color: var(--navy-dark); }
+    .modal-overlay-mini { background: rgba(15,23,42,.55); border-radius: 8px; padding: 26px 16px; display: flex; align-items: center; justify-content: center; }
+    .modal-box-mini { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 20px 18px; text-align: center; max-width: 260px; }
+    .modal-box-mini .ic { width: 36px; height: 36px; border-radius: 50%; background: var(--success-soft); color: var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 700; }
+    .modal-box-mini h4 { font-size: 15px; color: var(--navy-dark); margin: 0 0 6px; }
+    .modal-box-mini p { font-size: 11px; color: var(--text-soft); line-height: 1.5; margin: 0 0 12px; }
+    .status-badge-mini { display: inline-flex; align-items: center; gap: 7px; background: var(--warning-soft); color: var(--warning); font-weight: 700; font-size: 11px; letter-spacing: .03em; text-transform: uppercase; padding: 6px 12px; border-radius: 20px; margin-bottom: 14px; }
+    .status-dot-mini { width: 7px; height: 7px; border-radius: 50%; background: var(--warning); }
+    .next-list { list-style: none; margin: 0 0 14px; padding: 0; }
+    .next-list li { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border-muted); align-items: flex-start; }
+    .next-list li:last-child { border-bottom: none; }
+    .num-badge { width: 20px; height: 20px; border-radius: 50%; background: var(--primary-soft); color: var(--primary-dark); font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+    .next-list .t { font-size: 12.5px; font-weight: 600; color: var(--navy-dark); }
+    .next-list .d { font-size: 11px; color: var(--text-soft); margin-top: 2px; line-height: 1.5; }
+    .bring-box { background: var(--primary-soft); border-radius: 8px; padding: 12px 14px; font-size: 11px; color: var(--navy-dark); }
+    .bring-box b { display: block; margin-bottom: 5px; font-size: 10px; letter-spacing: .04em; text-transform: uppercase; color: var(--primary-dark); }
+    .bring-box ul { margin: 0; padding-left: 16px; line-height: 1.7; }
+
+    .legend-title { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 12px; }
+    .legend-item { display: flex; gap: 10px; margin-bottom: 14px; }
+    .legend-item:last-child { margin-bottom: 0; }
+    .legend-item .t { font-size: 13px; font-weight: 700; color: var(--navy-dark); margin: 0 0 3px; }
+    .legend-item .d { font-size: 12px; color: var(--text-soft); line-height: 1.55; margin: 0; }
+    .chip { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; border-radius: 50%; background: var(--primary); color: white; font-size: 9.5px; font-weight: 700; flex: 0 0 auto; }
+    .chip.alt { background: var(--navy-dark); }
+    .chip.sm { width: 14px; height: 14px; font-size: 8px; }
+    .note-strip { background: var(--navy-dark); color: #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 11.5px; line-height: 1.6; margin-top: 14px; }
+    .note-strip b { color: #fbbf24; }
+</style>
 </head>
 <body>
-
-    <div class="app-container">
-        <div class="app-sidebar">
-            <div class="user-profile-box" style="text-align: center; padding-bottom: 15px; border-bottom: 1px solid #334155; margin-bottom: 15px;">
-                <h3 style="font-size:14px; color:white;">Christian Alvarez</h3>
-                <span style="font-size:11px; color:var(--primary);">ULI-2026-00981</span>
-            </div>
-            <nav class="nav-links">
-                <a href="#" class="nav-item active">My Performance Analytics</a>
-                <a href="#" class="nav-item">Class Schedule Matrices</a>
-                <a href="#" class="nav-item">Instructor Evaluation</a>
-                <a href="#" class="nav-item">My Digital Certificates</a>
+    <div class="sidebar">
+        <div>
+            <h2>MCC Student</h2>
+            <nav class="nav-links" id="navLinks">
+                <button class="nav-item active" data-section="admission">Admission</button>
+                <button class="nav-item" data-section="grades">View Own Grades</button>
+                <button class="nav-item" data-section="assessment">Assessment</button>
+                <button class="nav-item" data-section="schedule">Schedule</button>
+                <button class="nav-item" data-section="profile">Student Profile (Dashboard)</button>
+                <button class="nav-item" data-section="withdrawal">Course Withdrawal</button>
+                <button class="nav-item" data-section="clearance">Clearance Request</button>
             </nav>
         </div>
+        <a href="../../index.html" class="nav-item back-btn">➔ Back to Portal Gateway</a>
+    </div>
 
-        <div class="main-content">
+    <div class="main-content">
+
+        <!-- ADMISSION -->
+        <div class="section active" id="sec-admission">
             <div class="header">
-                <div>
-                    <h1>Trainee Performance Profile Dashboard</h1>
-                    <p style="font-size: 13px; color: #64748b;">Localized student tracking and automated certification boundaries.</p>
-                </div>
-                <span class="role-tag">Active Trainee Portal</span>
+                <div><h1>Admission</h1><p class="sub">Apply for a program and track your application status.</p></div>
+                <span class="role-tag">Applicant / Trainee Module</span>
             </div>
-            
             <div class="card">
-                <h3>Current Curricular Lifecycle Progress</h3>
-                <div class="grid-3">
-                    <div class="stat-box">
-                        <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:bold;">Attendance Ratio</span>
-                        <h4 style="font-size:20px; color:var(--primary-dark);">95.2% Pass</h4>
+                <h3>Application Status</h3>
+                <div class="status-row">
+                    <div class="status-left">
+                        <div class="label">Current status</div>
+                        <div class="value">No application submitted yet</div>
                     </div>
-                    <div class="stat-box">
-                        <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:bold;">Modular Sign-offs</span>
-                        <h4 style="font-size:20px; color:var(--navy-dark);">4 / 4 Completed</h4>
-                    </div>
-                    <div class="stat-box">
-                        <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:bold;">Evaluation Standing</span>
-                        <h4 style="font-size:20px; color:#1e40af;">Competent (C)</h4>
-                    </div>
+                    <span class="badge"><span class="badge-dot"></span>Not Started</span>
                 </div>
+            </div>
+            <div class="card">
+                <h3>Start or Review Your Application</h3>
+                <p class="placeholder-note">The full application is a 5-step form — your info, program choice, schedule, document photos, and a review step — followed by on-site verification. Open the walkthrough below to see every screen with notes on what each part does.</p>
+                <div style="margin-top:16px;">
+                    <button class="btn" id="openPopupBtn">Open Step-by-Step Mockup</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRADES -->
+        <div class="section" id="sec-grades">
+            <div class="header">
+                <div><h1>View Grades</h1><p class="sub">Trainee view of numeric scores and Completed status per competency.</p></div>
+                <span class="role-tag">Trainee / Student Module</span>
+            </div>
+            <div class="card">
+                <h3>Module Placeholder</h3>
+                <p class="placeholder-note"><b>Not yet detailed.</b> This section will show per-competency scores (numeric or Completed status, per how Trainers currently grade) pulled from the trainer's records. Sidebar entry kept here to match the confirmed module list.</p>
             </div>
 
             <div class="card">
-                <h3>Automated National Clearance Tracking</h3>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Your digital institutional certificate generates automatically as soon as administrative constraints validate completely inside the PostgreSQL layer.</p>
-                <button class="btn btn-success" onclick="alert('Pre-conditions verified: Fetching secure certificate layout bundle...');">Securely Download Certificate of Completion (.PDF)</button>
+                <h3>Current Competency Progress</h3>
+                    <p>Qualification: <strong>Electrical Installation and Maintenance (EIM) NC II</strong></p>
+                    <table class="table"><tr><th>Competency</th><th>Status</th><th>Date</th></tr>
+                    <tr><td>Prepare Electrical Materials</td><td>Competent</td><td>July 12, 2026</td></tr>
+                    <tr><td>Install Wiring Devices</td><td>Competent</td><td>July 16, 2026</td></tr>
+                    <tr><td>Perform Electrical Testing</td><td>For Reassessment</td><td>Pending</td></tr>
+                    <tr><td>Read Electrical Plans</td><td>Competent</td><td>July 18, 2026</td></tr></table>
+                    <p><strong>Overall Progress:</strong> 3 of 4 competencies completed.</p>
+            </div>            
+        </div>
+
+        <!-- ASSESSMENT -->
+        <div class="section" id="sec-assessment">
+            <div class="header">
+                <div><h1>Assessment</h1><p class="sub">Status of formal TESDA competency assessment or in-house certification.</p></div>
+                <span class="role-tag">Trainee / Student Module</span>
+            </div>
+            <div class="card">
+                <h3>Module Placeholder</h3>
+                <p class="placeholder-note"><b>Not yet detailed.</b> Will likely show assessment schedule/venue, Competent / Not Yet Competent result, and certificate status — noting that for TESDA-registered programs, the system tracks status only and doesn't generate the official certificate.</p>
+            </div>
+
+            <div class="card">
+                <h3>Institutional Assessment Status</h3>
+                    <table class="table"><tr><th>Assessment</th><th>Result</th></tr>
+                    <tr><td>Basic Competencies</td><td>Competent</td></tr>
+                    <tr><td>Common Competencies</td><td>Competent</td></tr>
+                    <tr><td>Core Competencies</td><td>Ongoing</td></tr>
+                    <tr><td>Institutional Assessment</td><td>Pending</td></tr></table>
+                    <p>Recommendation: Complete all remaining competencies before National Assessment.</p>
+            </div>      
+        </div>
+
+        <!-- SCHEDULE -->
+        <div class="section" id="sec-schedule">
+            <div class="header">
+                <div><h1>Schedule</h1><p class="sub">Batch sessions, day/time, and attendance.</p></div>
+                <span class="role-tag">Trainee / Student Module</span>
+            </div>
+            <div class="card">
+                <h3>Module Placeholder</h3>
+                <p class="placeholder-note"><b>Not yet detailed.</b> Will show the trainee's confirmed batch schedule once enrollment is finalized by the Registrar.</p>
+            </div>
+
+            <div class="card">
+                <h3>Training Schedule</h3>
+                <ul>
+                <li><strong>Qualification:</strong> Electrical Installation and Maintenance NC II</li>
+                <li><strong>Batch:</strong> EIM-26-07</li>
+                <li><strong>Training Days:</strong> Monday to Friday</li>
+                <li><strong>Time:</strong> 8:00 AM - 5:00 PM</li>
+                <li><strong>Trainer:</strong> Engr. Maria Santos</li>
+                <li><strong>Venue:</strong> Workshop Room B</li>
+                </ul>
+            </div>            
+        </div>
+
+        <!-- PROFILE -->
+        <div class="section" id="sec-profile">
+            <div class="header">
+                <div><h1>Student Profile (Dashboard)</h1><p class="sub">Overview of the trainee's record — program, batch, documents on file, payment status.</p></div>
+                <span class="role-tag">Trainee / Student Module</span>
+            </div>
+
+            <div class="card">
+                <h3>Module Placeholder</h3>
+                <p class="placeholder-note"><b>Not yet detailed.</b> Likely the landing page after login — a summary dashboard pulling from Admission, Grades, Assessment, and Schedule.</p>
+            </div>
+                        <div class="card">
+                <h3>Trainee Overview</h3>
+                    <ul>
+                    <img src="https://media.tenor.com/DzTl5IIw-yMAAAAe/master-shifu-shifu.png" style="width:50px; height:50px; border-radius: 100px;">
+                    <li><strong>Name:</strong> Juan Dela Cruz</li>
+                    <li><strong>Trainee ID:</strong> MCCTEST-2026-00124</li>
+                    <li><strong>Qualification:</strong> EIM NC II</li>
+                    <li><strong>Enrollment Status:</strong> Enrolled</li>
+                    <li><strong>Attendance:</strong> 18 / 20 Days Present</li>
+                    <li><strong>Certification Status:</strong> Training Ongoing</li>
+                    </ul>
+            </div> 
+        </div>
+
+        <!-- WITHDRAWAL -->
+        <div class="section" id="sec-withdrawal">
+            <div class="header">
+                <div><h1>Course Withdrawal</h1><p class="sub">Request to drop from a batch or program.</p></div>
+                <span class="role-tag">Trainee / Student Module</span>
+            </div>
+            <div class="card">
+                <h3>Module Placeholder</h3>
+                <p class="placeholder-note"><b>Not yet detailed.</b> Current manual process involves surrendering ID/uniform as part of clearance after 3 absences or a voluntary drop — this screen would digitize that request.</p>
+            </div>
+
+            <div class="card">
+                <h3>Withdrawal Request</h3>
+                    <label>Reason</label>
+                    <select><option>Medical</option><option>Financial</option><option>Employment</option><option>Personal</option><option>Others</option></select>
+                    <label>Remarks</label>
+                    <input rows="4" placeholder="State your reason..."></input>
+                    <p>Status: No active withdrawal request.</p>
+            </div>           
+        </div>
+
+        <!-- CLEARANCE -->
+        <div class="section" id="sec-clearance">
+            <div class="header">
+                <div><h1>Clearance Request</h1><p class="sub">Request sign-off before claiming a certificate or re-enrolling.</p></div>
+                <span class="role-tag">Trainee / Student Module</span>
+            </div>
+            <div class="card">
+                <h3>Module Placeholder</h3>
+                <p class="placeholder-note"><b>Not yet detailed.</b> Would likely route to Registrar/Finance for confirmation that fees are settled and materials returned before release.</p>
+            </div>
+
+            <div class="card">
+                <h3>Clearance Status</h3>
+                    <table class="table"><tr><th>Office</th><th>Status</th></tr>
+                    <tr><td>Trainer</td><td>Cleared</td></tr>
+                    <tr><td>Registrar</td><td>Pending</td></tr>
+                    <tr><td>Finance</td><td>Cleared</td></tr>
+                    <tr><td>Tool Inventory</td><td>Cleared</td></tr></table>
+                    <p>Overall Status: Clearance in Progress.</p>
+            </div>            
+        </div>
+
+    </div>
+
+    <!-- POPUP: detailed admission mockup -->
+    <div class="overlay" id="overlay">
+        <div class="popup">
+            <div class="popup-head">
+                <h2 id="popupTitle">Admission — Step 1 of 7</h2>
+                <button class="close-x" id="closeBtn">✕</button>
+            </div>
+            <div class="popup-pills" id="popupPills"></div>
+            <div class="popup-body">
+                <p class="popup-caption" id="popupCaption"></p>
+                <div class="popup-layout">
+                    <div class="card" id="popupMockup"></div>
+                    <div class="card" id="popupLegend"></div>
+                </div>
+            </div>
+            <div class="popup-foot">
+                <button class="btn-ghost" id="prevBtn">← Back</button>
+                <button class="btn" id="nextBtn">Next →</button>
             </div>
         </div>
     </div>
 
+<script>
+(function(){
+    // sidebar section switching
+    document.getElementById('navLinks').addEventListener('click', function(e){
+        var btn = e.target.closest('.nav-item');
+        if(!btn) return;
+        document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+        btn.classList.add('active');
+        document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+        document.getElementById('sec-' + btn.dataset.section).classList.add('active');
+    });
+
+    // ---- popup step data ----
+    var STEPS = [
+    {
+        label: 'Info',
+        caption: 'First screen the applicant sees — captures the same basics the Registrar currently collects on the paper enrollment form.',
+        mockup: '<h3>Applicant Information</h3>'
+            + '<div class="form-grid single"><div class="form-group"><label><span class="chip sm">2</span>Full Name</label><input type="text" value="Juan D. Dela Cruz" disabled></div></div>'
+            + '<div class="form-grid"><div class="form-group"><label><span class="chip sm">3</span>Contact Number</label><input type="text" value="0917 123 4567" disabled></div><div class="form-group"><label>Email (optional)</label><input type="text" value="juan@email.com" disabled></div></div>'
+            + '<div class="form-grid single"><div class="form-group"><label>Barangay / Address</label><input type="text" value="Barangay Tabok, Mandaue City" disabled></div></div>'
+            + '<div class="form-group"><label><span class="chip sm">4</span>Are you a resident of Mandaue City?</label><div class="toggle-group"><span class="toggle-opt on">Yes</span><span class="toggle-opt">No</span></div></div>',
+        legend: '<p class="legend-title">What each part does</p>'
+            + '<div class="legend-item"><span class="chip sm">2</span><div><p class="t">Full Name</p><p class="d">Should match the Birth Certificate/PSA copy — this is what the Registrar checks against on-site.</p></div></div>'
+            + '<div class="legend-item"><span class="chip sm">3</span><div><p class="t">Contact Number</p><p class="d">Used to notify the applicant when their batch starts (currently done via Facebook post or text).</p></div></div>'
+            + '<div class="legend-item"><span class="chip sm">4</span><div><p class="t">Mandaue Residency toggle</p><p class="d">Selecting "No" flags the record for the Registrar to confirm the applicable tuition fee in person.</p></div></div>'
+    },
+    {
+        label: 'Program',
+        caption: 'Enforces the rule from the interviews: one NC2 program, plus an optional community-based program — never two NC2 programs at once.',
+        mockup: '<h3>Select Your Program</h3>'
+            + '<div class="group-title"><span class="chip sm">1</span>NC2-Accredited (choose one)</div>'
+            + '<div class="opt-grid"><div class="opt-card radio sel"><div class="mark"></div><div><div class="t">Hilot NC2</div><div class="d">TESDA-registered</div></div></div><div class="opt-card radio"><div class="mark"></div><div><div class="t">EIM NC2</div><div class="d">TESDA-registered</div></div></div></div>'
+            + '<div class="group-title" style="margin-top:16px;"><span class="chip sm">2</span>Community-Based (optional)</div>'
+            + '<div class="opt-grid"><div class="opt-card sel"><div class="mark"></div><div><div class="t">Cookery</div><div class="d">Non-registered short program</div></div></div><div class="opt-card"><div class="mark"></div><div><div class="t">Dressmaking</div><div class="d">Non-registered short program</div></div></div></div>',
+        legend: '<p class="legend-title">What each part does</p>'
+            + '<div class="legend-item"><span class="chip sm">1</span><div><p class="t">NC2 group — single-select</p><p class="d">Choosing a second NC2 card deselects the first (radio behavior).</p></div></div>'
+            + '<div class="legend-item"><span class="chip sm">2</span><div><p class="t">Community group — optional</p><p class="d">Selecting one alongside an NC2 program is the only allowed 2-program combination.</p></div></div>'
+            + '<div class="note-strip"><b>Open item:</b> full list of the 16 community-based programs is still pending from the Owner/Admin — placeholders shown here.</div>'
+    },
+    {
+        label: 'Schedule',
+        caption: 'A preference only — no exact date is promised here, since batch start depends on headcount and the Trainer\'s call.',
+        mockup: '<h3>Select a Schedule</h3>'
+            + '<div class="opt-grid"><div class="opt-card radio"><div class="mark"></div><div><div class="t">Morning Batch</div><div class="d">Starts once minimum enrollees are reached</div></div></div><div class="opt-card radio sel"><div class="mark"></div><div><div class="t">Evening Batch</div><div class="d"><span class="chip sm">1</span> Fills faster — usually starts sooner</div></div></div></div>',
+        legend: '<p class="legend-title">What each part does</p>'
+            + '<div class="legend-item"><span class="chip sm">1</span><div><p class="t">Helper note per card</p><p class="d">Sets honest expectations — evening batches historically fill faster, per the Owner interview.</p></div></div>'
+    },
+    {
+        label: 'Documents',
+        caption: 'Applicant photographs each required document ahead of time so the Registrar has something to pre-check before the visit.',
+        mockup: '<h3>Upload Requirement Photos</h3>'
+            + '<div class="progress-bar"><div class="progress-fill"></div></div>'
+            + '<div class="doc-row done"><div class="doc-thumb">✓</div><div class="doc-meta"><div class="t">Birth Certificate (PSA/NSO)</div><div class="d"><span class="chip alt sm">1</span> Uploaded</div></div><div class="doc-btn">Replace</div></div>'
+            + '<div class="doc-row"><div class="doc-thumb">＋</div><div class="doc-meta"><div class="t">Barangay Clearance</div><div class="d">Not uploaded yet</div></div><div class="doc-btn"><span class="chip sm">2</span> Upload photo</div></div>'
+            + '<div class="doc-row"><div class="doc-thumb">＋</div><div class="doc-meta"><div class="t">Cedula</div><div class="d">Not uploaded yet</div></div><div class="doc-btn">Upload photo</div></div>',
+        legend: '<p class="legend-title">What each part does</p>'
+            + '<div class="legend-item"><span class="chip alt sm">1</span><div><p class="t">Completed document row</p><p class="d">Thumbnail + status confirm the upload; "Replace" lets them retake a blurry photo.</p></div></div>'
+            + '<div class="legend-item"><span class="chip sm">2</span><div><p class="t">Upload photo button</p><p class="d">Opens the phone\'s camera directly, or a file picker on desktop.</p></div></div>'
+            + '<div class="note-strip">These photos are for <b>pre-screening only</b> — the applicant still brings physical originals on-site.</div>'
+    },
+    {
+        label: 'Review',
+        caption: 'Last chance to check everything before it\'s sent to the Registrar\'s queue.',
+        mockup: '<h3>Review Your Application</h3>'
+            + '<div class="review-block"><h4>Applicant</h4><div class="review-row"><span class="k">Name</span><span class="v">Juan D. Dela Cruz</span></div><div class="review-row"><span class="k">Mandaue resident</span><span class="v">Yes</span></div></div>'
+            + '<div class="review-block"><h4>Program &amp; Schedule</h4><div class="review-row"><span class="k">NC2 Program</span><span class="v">Hilot NC2</span></div><div class="review-row"><span class="k">Schedule</span><span class="v">Evening Batch</span></div></div>',
+        legend: '<p class="legend-title">What each part does</p>'
+            + '<div class="legend-item"><span class="chip">1</span><div><p class="t">Read-only summary blocks</p><p class="d">Grouped by section. Nothing is editable directly — the applicant taps "Back" to fix anything.</p></div></div>'
+    },
+    {
+        label: 'Confirmation',
+        caption: 'Appears immediately after Submit. Confirms receipt and sets the expectation that a physical visit is still required.',
+        mockup: '<h3>Confirmation Modal</h3>'
+            + '<div class="modal-overlay-mini"><div class="modal-box-mini"><div class="ic"><span class="chip alt">1</span></div><h4><span class="chip sm">2</span> Application received</h4><p><span class="chip sm">3</span> Thank you for applying to MCCTEST. Our Registrar will review your details before your on-site visit.</p></div></div>',
+        legend: '<p class="legend-title">What each part does</p>'
+            + '<div class="legend-item"><span class="chip alt sm">1</span><div><p class="t">Checkmark icon</p><p class="d">Visual confirmation the submission went through.</p></div></div>'
+            + '<div class="legend-item"><span class="chip sm">2</span><div><p class="t">Headline</p><p class="d">Neutral tone — the applicant isn\'t enrolled yet.</p></div></div>'
+            + '<div class="legend-item"><span class="chip sm">3</span><div><p class="t">Body copy</p><p class="d">Explicitly names the Registrar and the on-site step so nothing is assumed.</p></div></div>'
+    },
+    {
+        label: 'Next Steps',
+        caption: 'Replaces the form after the modal closes. This is where the flow hands off from digital to in-person.',
+        mockup: '<h3>Next Steps (Post-Submission)</h3>'
+            + '<div class="status-badge-mini"><span class="status-dot-mini"></span><span class="chip alt sm">1</span>Pending On-Site Verification</div>'
+            + '<ul class="next-list"><li><div class="num-badge"><span class="chip sm">2</span></div><div><div class="t">Bring your original documents on-site</div><div class="d">Originals of everything you photographed, plus the ₱500 ID &amp; uniform fee.</div></div></li>'
+            + '<li><div class="num-badge">2</div><div><div class="t">Registrar verifies face-to-face</div><div class="d">Originals are checked against submissions, then enrollment is finalized.</div></div></li>'
+            + '<li><div class="num-badge">3</div><div><div class="t">SkillTrack account unlocks</div><div class="d">Trainee can log in to view schedule, attendance, and grades.</div></div></li></ul>'
+            + '<div class="bring-box"><b><span class="chip sm">3</span> Bring with you</b><ul><li>Birth Certificate (original)</li><li>Barangay Clearance (original)</li><li>₱500 ID &amp; uniform fee</li></ul></div>',
+        legend: '<p class="legend-title">What each part does</p>'
+            + '<div class="legend-item"><span class="chip alt sm">1</span><div><p class="t">Status badge</p><p class="d">Signals the applicant isn\'t fully enrolled until the on-site step happens.</p></div></div>'
+            + '<div class="legend-item"><span class="chip sm">2</span><div><p class="t">3-step handoff list</p><p class="d">Step 1 is the applicant\'s action; steps 2–3 are staff actions the applicant waits on.</p></div></div>'
+            + '<div class="legend-item"><span class="chip sm">3</span><div><p class="t">"Bring with you" checklist</p><p class="d">Quick recap so the applicant doesn\'t scroll back through earlier screens.</p></div></div>'
+    }
+    ];
+
+    var current = 0;
+
+    function renderPills(){
+        var wrap = document.getElementById('popupPills');
+        wrap.innerHTML = '';
+        STEPS.forEach(function(s, i){
+            var p = document.createElement('button');
+            p.className = 'p-pill' + (i===current ? ' active' : '');
+            p.textContent = (i+1) + ' ' + s.label;
+            p.addEventListener('click', function(){ current = i; renderAll(); });
+            wrap.appendChild(p);
+        });
+    }
+
+    function renderAll(){
+        renderPills();
+        var s = STEPS[current];
+        document.getElementById('popupTitle').textContent = 'Admission — Step ' + (current+1) + ' of ' + STEPS.length + ': ' + s.label;
+        document.getElementById('popupCaption').textContent = s.caption;
+        document.getElementById('popupMockup').innerHTML = s.mockup;
+        document.getElementById('popupLegend').innerHTML = s.legend;
+        document.getElementById('prevBtn').disabled = current === 0;
+        document.getElementById('nextBtn').textContent = current === STEPS.length-1 ? 'Close' : 'Next →';
+        document.getElementById('popupBody') && (document.querySelector('.popup-body').scrollTop = 0);
+    }
+
+    document.getElementById('openPopupBtn').addEventListener('click', function(){
+        current = 0;
+        renderAll();
+        document.getElementById('overlay').classList.add('open');
+    });
+    document.getElementById('closeBtn').addEventListener('click', function(){
+        document.getElementById('overlay').classList.remove('open');
+    });
+    document.getElementById('overlay').addEventListener('click', function(e){
+        if(e.target.id === 'overlay') document.getElementById('overlay').classList.remove('open');
+    });
+    document.getElementById('prevBtn').addEventListener('click', function(){
+        if(current > 0){ current--; renderAll(); }
+    });
+    document.getElementById('nextBtn').addEventListener('click', function(){
+        if(current < STEPS.length-1){ current++; renderAll(); }
+        else { document.getElementById('overlay').classList.remove('open'); }
+    });
+})();
+</script>
 </body>
 </html>
