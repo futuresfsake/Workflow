@@ -3,96 +3,474 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCCTEST Portal - Trainer Evaluation Portal</title>
+    <title>SkillTrack - Instructor Technical Functional Workflows</title>
     <style>
         :root {
-            --primary: #f59e0b;
-            --primary-dark: #d97706;
             --navy-dark: #0f172a;
+            --primary-blue: #1e3a8a;
+            --accent-blue: #3b82f6;
             --bg-light: #f8fafc;
-            --border: #cbd5e1;
-            --text: #334155;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --color-trainer: #f59e0b;
+            --color-trainer-dark: #d97706;
+            
+            /* Status / Context Callout Colors */
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+            --info-bg: #f0fdf4;
+            --info-border: #d1fae5;
+            --info-text: #15803d;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); display: flex; min-height: 100vh; }
+
+        /* Left Navigation Panel */
+        .sidebar { width: 320px; background-color: var(--navy-dark); color: white; padding: 30px 20px; display: flex; flex-direction: column; gap: 20px; border-right: 1px solid var(--border-muted); position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 10px; }
+        .sidebar p { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; text-align: center; }
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-        .nav-item { padding: 10px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; font-weight: 500; }
-        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
-        .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
+        .menu-group { margin-bottom: 15px; }
+        .menu-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; margin-bottom: 8px; padding-left: 5px; }
+        .task-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+        .task-link { padding: 8px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; display: block; transition: all 0.2s; }
+        .task-link:hover { background-color: rgba(255,255,255,0.04); color: #f1f5f9; }
+        .task-link.active { background-color: var(--color-trainer); color: var(--navy-dark); font-weight: 600; }
+
+        /* Main Workspace Container */
+        .workspace { flex: 1; margin-left: 320px; padding: 50px 60px; max-width: 1000px; }
         
-        .main-content { flex: 1; padding: 35px; overflow-y: auto; }
-        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 24px; color: var(--navy-dark); }
-        .role-tag { background-color: #fef3c7; color: var(--primary-dark); font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 11px; text-transform: uppercase; }
+        /* Workflow Visual Components */
+        .workflow-container { display: none; }
+        .workflow-container.active { display: block; animation: easeIn 0.3s forwards; }
+        @keyframes easeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .feature-meta { font-size: 13px; font-weight: 700; color: var(--color-trainer-dark); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .task-title { font-size: 28px; color: var(--navy-dark); font-weight: 700; margin-bottom: 30px; letter-spacing: -0.5px; border-bottom: 2px solid var(--border-muted); padding-bottom: 15px; }
         
-        .card { background: white; border: 1px solid var(--border-muted); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+        /* Step-by-Step Layout Paradigm with Connector Lines */
+        .step-block { display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 0; padding-bottom: 30px; position: relative; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
-        th { background-color: #f1f5f9; font-weight: 600; }
-        .btn { padding: 8px 16px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background-color: var(--primary); color: white; }
+        /* Vertical line tracking configuration */
+        .step-block::after {
+            content: '';
+            position: absolute;
+            left: 20px; /* Aligns exactly with the center position of the 40px grid column */
+            top: 26px;  /* Spaced just under the step number text wrapper */
+            bottom: -6px; /* Extends down to meet the top of the subsequent step card bubble */
+            width: 2px;
+            background-color: var(--border-muted);
+        }
+        
+        /* Prevent line generation from leaking past the final step node entry */
+        .step-block:last-child::after { display: none; }
+        .step-block:last-child { padding-bottom: 10px; }
+
+        /* Step Circle Badge adjustments */
+        .step-number { 
+            font-size: 13px; 
+            font-weight: 700; 
+            color: #64748b; 
+            background: #e2e8f0;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            justify-self: center;
+            z-index: 2; /* Keeps circle badge securely over top of the custom connector element string lines */
+        }
+        
+        .step-content { display: flex; flex-direction: column; gap: 4px; padding-top: 2px; }
+        .step-name { font-size: 16px; font-weight: 600; color: var(--navy-dark); }
+        .step-description { font-size: 14px; color: #475569; line-height: 1.6; }
+
+        /* Document Condition / Warning Binders from Reference Image */
+        .step-callout { margin-top: 10px; border-radius: 8px; padding: 15px; font-size: 13px; line-height: 1.5; display: flex; flex-direction: column; gap: 5px; border-left: 4px solid transparent; }
+        .callout-warning { background-color: var(--warning-bg); border: 1px solid var(--warning-border); border-left-color: var(--color-trainer); color: var(--warning-text); }
+        .callout-info { background-color: var(--info-bg); border: 1px solid var(--info-border); border-left-color: var(--info-text); color: var(--info-text); }
+        .callout-title { font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        
+        code { background-color: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; color: var(--navy-dark); }
     </style>
 </head>
 <body>
+
     <div class="sidebar">
+        <button onclick="window.location.href='../../index.html';" style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #cbd5e1;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            margin-left: 0;
+            margin-bottom: 5px;"
+            onmouseover="this.style.backgroundColor='#334155'; this.style.color='#ffffff';"
+            onmouseout="this.style.backgroundColor='#1e293b'; this.style.color='#cbd5e1';">
+            ←
+        </button>
         <div>
-            <h2>MCC Instructor</h2>
-            <nav class="nav-links">
-                <a href="#" class="nav-item active">Competency Checklists</a>
-                <a href="#" class="nav-item">Classroom Resource Matrix</a>
-                <a href="#" class="nav-item">Attendance Cutoff Tracker</a>
-                <a href="#" class="nav-item">Submit Batch Metrics</a>
-            </nav>
+            <h2>SkillTrack System</h2>
+            <p>Trainer Operational Logs</p>
         </div>
-        <a href="../../index.html" class="nav-item back-btn">➔ Back to Portal Gateway</a>
+
+        <div class="menu-group">
+            <div class="menu-group-title">1. Class & Student List</div>
+            <ul class="task-list">
+                <li class="task-link active" onclick="routeTask('t1-view', this)">View Assigned Class Batches</li>
+                <li class="task-link" onclick="routeTask('t2-view', this)">Review Student Profiles</li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">2. Attendance Management</div>
+            <ul class="task-list">
+                <li class="task-link" onclick="routeTask('t3-view', this)">Check & Encode Daily Attendance</li>
+                <li class="task-link" onclick="routeTask('t4-view', this)">Configure Attendance Cutoffs</li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">3. Progress & Grade Encoding</div>
+            <ul class="task-list">
+                <li class="task-link" onclick="routeTask('t5-view', this)">Encode Competency Marks</li>
+                <li class="task-link" onclick="routeTask('t6-view', this)">Review Progress Charts</li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">4. Inventory & Borrowing</div>
+            <ul class="task-list">
+                <li class="task-link" onclick="routeTask('t7-view', this)">Verify Tool Inventory Asset Ledger</li>
+                <li class="task-link" onclick="routeTask('t8-view', this)">Approve Laboratory Borrower Requests</li>
+                <li class="task-link" onclick="routeTask('t9-view', this)">Review Historical Borrow Logs</li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">5. Approvals & Administrative</div>
+            <ul class="task-list">
+                <li class="task-link" onclick="routeTask('t10-view', this)">Process Student Course Withdrawals</li>
+                <li class="task-link" onclick="routeTask('t11-view', this)">Authorize Final Clearance Release</li>
+            </ul>
+        </div>
     </div>
-    <div class="main-content">
-        <div class="header">
-            <div>
-                <h2>Active Class Roster Checkpoints</h2>
-                <p style="font-size: 13px; color: #64748b;">Sign off modular training block benchmarks and attendance criteria rules.</p>
+
+    <div class="workspace">
+
+        <div id="t1-view" class="workflow-container active">
+            <div class="feature-meta">Feature: Class List</div>
+            <div class="task-title">View Assigned Class Batches</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Open Instructor Portal Dashboard</div>
+                    <div class="step-description">Navigate directly to your authorized Instructor workspace from the master SkillTrack deployment directory.</div>
+                </div>
             </div>
-            <span class="role-tag">COURSE TRAINER DASHBOARD</span>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Access Assigned Qualifications List</div>
+                    <div class="step-description">Locate the "Assigned Qualifications" operational card block view containing your active teaching assignments.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Select Target Training Batch Allocation</div>
+                    <div class="step-description">Locate your active structural class block (e.g., <code>CSS-NC2-2026A</code>) and select the corresponding item row configuration.</div>
+                    <div class="step-callout callout-info">
+                        <span class="callout-title">System Automation Notice</span>
+                        Selecting a target batch dynamically parameters the system's global query filters, updating the relational records available for grading and tracking modules.
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="card">
-            <h3>Active Roster: Computer Systems Servicing NC II</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Trainee ULI</th>
-                        <th>Student Name</th>
-                        <th>Attendance Block Log</th>
-                        <th>Practical Skill Competency Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>ULI-2026-00981</code></td>
-                        <td>Alvarez, Christian</td>
-                        <td style="color:green; font-weight:bold;">94% Attendance</td>
-                        <td>
-                            <select style="padding:4px; font-size:12px;">
-                                <option>Pending Checkoff</option>
-                                <option>Competent (C)</option>
-                                <option>Not Yet Competent (NYC)</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>ULI-2026-00442</code></td>
-                        <td>Mercado, Beatrice</td>
-                        <td style="color:red; font-weight:bold;">68% [DROPPED EXCEPTION]</td>
-                        <td><select style="padding:4px; font-size:12px;" disabled><option>Locked - Under Attendance Threshold</option></select></td>
-                    </tr>
-                </tbody>
-            </table>
-            <button class="btn" style="margin-top: 15px;" onclick="alert('Roster performance indicators committed to relational views.');">Save Grading Matrix Logs</button>
+
+        <div id="t2-view" class="workflow-container">
+            <div class="feature-meta">Feature: Student List</div>
+            <div class="task-title">Review Student Profiles</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Navigate to Active Student Directory View</div>
+                    <div class="step-description">From your active class selection layout, scroll downward to locate the integrated relational student grid mapping.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Parse Unique Learner Identifier (ULI) Records</div>
+                    <div class="step-description">Verify each trainee's physical credentials against their system-rendered national TESDA ULI string parameters or their personal ID in the system.</div>
+                    <div class="step-callout callout-warning">
+                        <span class="callout-title">Possible Warning For Step</span>
+                        If a trainee's registration metadata displays an unverified status label, contact the master Registrar administrative office to parse missing archival records before saving progress milestones.
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <div id="t3-view" class="workflow-container">
+            <div class="feature-meta">Feature: Attendance Sheet</div>
+            <div class="task-title">Check & Encode Daily Attendance</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Initialize Active Attendance Entry Date</div>
+                    <div class="step-description">Open the "Attendance Sheets" structural view window and ensure the tracking calendar element matches the current system date sequence.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Modify Trainee Operational Attendance Status Indicators</div>
+                    <div class="step-description">Select from the dropdown selection arrays matching individual student rows to allocate status values: <code>Present</code>, <code>Absent</code>, or <code>Late</code>.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Commit Daily Log Session Metrics</div>
+                    <div class="step-description">Click the "Save Current Sheet Daily Record" input button to save the dataset configuration into your local relational instance layer.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t4-view" class="workflow-container">
+            <div class="feature-meta">Feature: Attendance Sheet Tool</div>
+            <div class="task-title">Configure Attendance Cutoffs & Threshold Audits</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Verify Cumulative Core Class Block Hours</div>
+                    <div class="step-description">Access the cumulative summary views on the attendance worksheet component layout to inspect overall tracking thresholds.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Audit System Lock Flags</div>
+                    <div class="step-description">Identify records displaying attendance thresholds falling below mandated institutional ratios (e.g., 80% attendance compliance limits).</div>
+                    <div class="step-callout callout-warning">
+                        <span class="callout-title">Automated Drop Enforcement Warning</span>
+                        The underlying system engine will automatically apply an <code>[DROPPED EXCEPTION]</code> tag and lock input elements for trainees who cross negative attendance parameters.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t5-view" class="workflow-container">
+            <div class="feature-meta">Feature: Grade Encoding</div>
+            <div class="task-title">Encode Competency Marks</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Load Binary Competency Assessment Grid</div>
+                    <div class="step-description">Access the "Competency Grade Encoding Matrix" tab view to display student records alongside structural core performance units.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Apply Binary Grading Evaluation Choices</div>
+                    <div class="step-description">Evaluate laboratory performance and map specific unit dropdown metrics to either <code>Competent (C)</code> or <code>Not Yet Competent (NYC)</code> status markers.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Commit Grade Matrices to Relational Architecture</div>
+                    <div class="step-description">Click the "Encode" confirmation button to save the updated assessment matrix data fields securely into the database layer.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t6-view" class="workflow-container">
+            <div class="feature-meta">Feature: Progress Chart of Students</div>
+            <div class="task-title">Review Student Progress Charts & Analytics Dashboard</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Access Real-Time Progress Aggregation Views</div>
+                    <div class="step-description">Navigate directly to the student tracking summary chart grid panel within your primary grading context view.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Evaluate Completion Percentage Indicators</div>
+                    <div class="step-description">Analyze visual status bars mapping overall module progress metrics across the assigned qualification's core competency criteria requirements.</div>
+                    <div class="step-callout callout-info">
+                        <span class="callout-title">NC2 Readiness Rule</span>
+                        Trainees who hit 100% completion parameters across all structural core competency nodes are flagged automatically for final institutional certification routines.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t7-view" class="workflow-container">
+            <div class="feature-meta">Feature: Tool Inventory</div>
+            <div class="task-title">Verify Tool Inventory Asset Ledger</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Open Tool Inventory Control Registry Window</div>
+                    <div class="step-description">Select the "Tool Inventory Ledger" option mapping under the sidebar navigation group area to access physical asset lists.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Audit Stock and Functionality Parameters</div>
+                    <div class="step-description">Inspect technical inventory items, evaluating total allocation counts, active quantities, and real-time operational status attributes.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t8-view" class="workflow-container">
+            <div class="feature-meta">Feature: Borrower Request & Approve</div>
+            <div class="task-title">Approve Laboratory Borrower Requests</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Load Active Pending Borrower Queues</div>
+                    <div class="step-description">Navigate to the "Borrower Requests" component display card window to view pending trainee instrumentation and tool demands.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Process Operational Authorization Determinations</div>
+                    <div class="step-description">Validate item availability markers against current database states and click either the green <code>Approve</code> or red <code>Reject</code> workflow buttons.</div>
+                    <div class="step-callout callout-warning">
+                        <span class="callout-title">Asset Tracking Constraint</span>
+                        Approving a request modifies asset status values inside the tool log database, updating tracking records until the student checks the hardware items back in.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t9-view" class="workflow-container">
+            <div class="feature-meta">Feature: Borrow History</div>
+            <div class="task-title">Review Historical Borrow Logs</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Open Historical Records Viewport</div>
+                    <div class="step-description">Locate the "Historical Borrow History Records" dataset table layout situated beneath the active pending processing modules.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Verify Return-Status Audit Strings</div>
+                    <div class="step-description">Confirm structural item histories by evaluating past tool distributions, checkout intervals, and logged clean return timestamps.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t10-view" class="workflow-container">
+            <div class="feature-meta">Feature: Course Withdrawal Approval</div>
+            <div class="task-title">Process Student Course Withdrawals</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Access Course Withdrawal Processing Matrix</div>
+                    <div class="step-description">Select the "Withdrawal & Clearance" option block under the sidebar layout index directory mapping to list pending trainee resignation records.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Review Listed Student Hardship Justifications</div>
+                    <div class="step-description">Read through explicit textual reasons submitted by trainees requesting official program exit processing adjustments.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Authorize Withdrawal Flags</div>
+                    <div class="step-description">Click the "Approve" action input component configuration to finalize academic drop procedures, routing information updates directly to the Registrar Office.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="t11-view" class="workflow-container">
+            <div class="feature-meta">Feature: Clearance Approval & Integrate Certification Generation</div>
+            <div class="task-title">Authorize Final Clearance Release</div>
+            
+            <div class="step-block">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Verify Laboratory Asset Liabilities</div>
+                    <div class="step-description">Review each trainee's inventory records to ensure they have returned all borrowed instrumentation before approving clearance.</div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Execute Institutional Clearance Sign-Off Actions</div>
+                    <div class="step-description">Click the "Sign Off Clearance" button layout component for eligible students to mark their institutional account records as clear.</div>
+                    <div class="step-callout callout-info">
+                        <span class="callout-title">Downstream Certification Hook</span>
+                        Signing off on programmatic clearance triggers an automated database hook, letting the Registrar auto-generate and stamp the final NC2 completion certificate.
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <script>
+        function routeTask(viewId, element) {
+            // Unbind active states across current navigation menus
+            document.querySelectorAll('.task-link').forEach(item => item.classList.remove('active'));
+            // Highlight selected target node element reference
+            element.classList.add('active');
+            
+            // Hide all active workflow document window frameworks
+            document.querySelectorAll('.workflow-container').forEach(panel => panel.classList.remove('active'));
+            // Reveal chosen workspace block target panel container routing index
+            const targetWorkflow = document.getElementById(viewId);
+            targetWorkflow.classList.add('active');
+        }
+    </script>
 </body>
 </html>
