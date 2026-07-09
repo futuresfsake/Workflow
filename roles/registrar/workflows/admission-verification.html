@@ -83,46 +83,54 @@
             <div class="step-block completed">
                 <div class="step-number">1</div>
                 <div class="step-content">
-                    <div class="step-name">Open Registrar Portal</div>
-                    <div class="step-description">Access the secure admin workspace from the primary system login portal router.</div>
+                    <div class="step-name">Open Admission Management</div>
+                    <div class="step-description">Select <strong>Admission Verification</strong> from the left sidebar workspace to initialize the incoming application router.</div>
                 </div>
             </div>
 
             <div class="step-block completed">
                 <div class="step-number">2</div>
                 <div class="step-content">
-                    <div class="step-name">Click Admissions List</div>
+                    <div class="step-name">View Pending Applications</div>
+                    <div class="step-description">The system displays the centralized queue table listing all active files, sorted by submission date (oldest first).</div>
+                </div>
+            </div>
+
+            <div class="step-block completed">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Search or Filter the Queue</div>
                     <div class="step-description">
-                        Launch the master queue table containing all incoming application files. <br>
-                        <button type="button" class="click-link" onclick="toggleModal('admissions-modal', true)">[Click View Admissions List]</button>
+                        Use the system search criteria or parameters to locate a specific applicant file by name, track, or qualification range. <br>
+                        <button type="button" class="click-link" onclick="toggleModal('admissions-modal', true)">[Click View Admissions List Queue]</button>
                     </div>
+                </div>
+            </div>
+
+            <div class="step-block completed">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-name">Select an Applicant</div>
+                    <div class="step-description">Click the "Select Target" link on a database application row to lock the applicant profile index securely into running memory context.</div>
                 </div>
             </div>
 
             <div class="step-block active">
-                <div class="step-number">3</div>
+                <div class="step-number">5</div>
                 <div class="step-content">
-                    <div class="step-name">Verify and Inspect Student Digital Documents</div>
+                    <div class="step-name">Verify Requirements</div>
                     <div class="step-description">
-                        Click the high-visibility blue inspection button below to securely open the digital documents workspace modal. <br>
-                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('inspection-modal', true)">View Document Inspection</button>
+                        Click the high-visibility inspection workspace trigger below to evaluate personal data fields directly against structural document frames. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('inspection-modal', true)">Inspect Uploaded Requirements</button>
                     </div>
                 </div>
             </div>
 
             <div class="step-block">
-                <div class="step-number">4</div>
+                <div class="step-number">6</div>
                 <div class="step-content">
-                    <div class="step-name">Cross-Reference Data Fields</div>
-                    <div class="step-description">Run verification audits checking inputted fields directly against scanned document structures. </div>
-                </div>
-            </div>
-
-            <div class="step-block">
-                <div class="step-number">5</div>
-                <div class="step-content">
-                    <div class="step-name">Send Trigger to System Dashboard</div>
-                    <div class="step-description">Authorize conditional acceptance to transition the candidate to the onsite evaluation registry.</div>
+                    <div class="step-name">Decide the Next Action</div>
+                    <div class="step-description">Authorize the transaction record. Proceed to **Approve** (dispatching conditional acceptance flags), **Reject**, or request a document **Revision** trigger.</div>
                 </div>
             </div>
 
@@ -133,16 +141,16 @@
     <div id="admissions-modal" class="modal-overlay">
         <div class="modal-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px;">
-                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Pending Admissions Profiles</h3>
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Pending Admissions Profiles Queue</h3>
                 <button type="button" class="click-link" onclick="toggleModal('admissions-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
             </div>
             <table class="admission-table">
                 <thead>
                     <tr>
-                        <th>Student Name</th>
-                        <th>Target Program</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th>Applicant Target Name</th>
+                        <th>Target Program Track</th>
+                        <th>Pipeline Status</th>
+                        <th>Action Router</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -167,7 +175,7 @@
     <div id="inspection-modal" class="modal-overlay">
         <div class="modal-box" style="width: 780px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px;">
-                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Document Inspection Workspace Mockup</h3>
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Requirements Inspection Workspace Console</h3>
                 <button type="button" class="click-link" onclick="toggleModal('inspection-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
             </div>
             
@@ -180,26 +188,28 @@
 
                 <div>
                     <div class="form-group">
-                        <label>Active Trainee Profile</label>
+                        <label>Active Applicant Profile Context</label>
                         <input type="text" id="target-student" value="Juan Dela Cruz" disabled>
                     </div>
                     <div class="form-group">
-                        <label>Cross-Reference Field Match</label>
+                        <label>Cross-Reference Verification Match</label>
                         <input type="text" value="JUAN DELA CRUZ" disabled style="letter-spacing: 0.5px;">
                     </div>
                     <div class="form-group">
-                        <label>Pipeline Status Control</label>
-                        <select>
-                            <option value="CONDITIONALLY_APPROVED">CONDITIONALLY_APPROVED</option>
+                        <label>Decision Engine Action Pipeline</label>
+                        <select id="action-select">
+                            <option value="APPROVE">APPROVE (Send Conditional Acceptance)</option>
+                            <option value="REJECT">REJECT (Deny Application Profile)</option>
+                            <option value="REVISION">REQUEST REVISION (Flag Missing Files)</option>
                         </select>
                     </div>
                     
                     <div class="step-callout">
-                        <strong>Rule Description:</strong> Clicking the validation button below executes an atomic database transaction to update the active row pointer.
+                        <strong>Rule Description:</strong> Authorizing a validation choice executes an atomic transaction query updating the row state pointer values directly.
                     </div>
                     
                     <button type="button" class="action-btn" onclick="commitDatabaseUpdate()">
-                        Update Database Row
+                        Authorize Action & Update Row
                     </button>
                 </div>
             </div>
@@ -220,12 +230,13 @@
         function selectStudent(studentName) {
             document.getElementById('target-student').value = studentName;
             toggleModal('admissions-modal', false);
-            alert(`Context loaded for target: ${studentName}. Click the blue "View Document Inspection" button next.`);
+            alert(`Context locked for applicant: ${studentName}. Click the blue "Inspect Uploaded Requirements" button next.`);
         }
 
         function commitDatabaseUpdate() {
             const traineeName = document.getElementById('target-student').value;
-            alert(`Row update executed! PostgreSQL state flag set to [CONDITIONALLY_APPROVED] for: ${traineeName}.`);
+            const chosenAction = document.getElementById('action-select').value;
+            alert(`Row update executed! PostgreSQL state flag mutated to status code [${chosenAction}] for candidate: ${traineeName}.`);
             toggleModal('inspection-modal', false);
         }
     </script>

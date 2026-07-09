@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Re-Enrollment Process</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1d4ed8;
+            --accent-red: #dc2626;
+            --accent-red-dark: #b91c1c;
+            --bg-light: #f8fafc;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --success: #16a34a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); padding: 40px; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
+
+        .container { width: 100%; max-width: 750px; background: white; padding: 50px 45px; border-radius: 12px; border: 1px solid var(--border-muted); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01); }
+
+        .feature-meta { font-size: 11px; font-weight: 700; color: #dc2626; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .task-title { font-size: 26px; color: var(--navy-dark); font-weight: 700; margin-bottom: 35px; border-bottom: 1px solid var(--border-muted); padding-bottom: 16px; }
+        
+        /* Continuous Vertical Stepper Layout Matrix */
+        .step-block { display: grid; grid-template-columns: 35px 1fr; gap: 20px; padding-bottom: 35px; position: relative; }
+        .step-block::after {
+            content: ''; position: absolute; left: 16px; top: 26px; bottom: -10px; width: 2px; background-color: var(--border-muted); z-index: 1;
+        }
+        .step-block:last-child::after { display: none; }
+        .step-block:last-child { padding-bottom: 5px; }
+
+        /* Step Circle Badges */
+        .step-number { 
+            font-size: 11px; font-weight: 700; color: #64748b; background: #e2e8f0;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; justify-self: center; z-index: 2; position: relative; border: 2px solid white;
+        }
+        .step-block.completed .step-number { background: #22c55e; color: white; border-color: #22c55e; }
+        .step-block.active .step-number { background: var(--accent-red); color: white; border-color: var(--accent-red); box-shadow: 0 0 0 3px #fee2e2; }
+        .step-block.pending .step-number { background: #cbd5e1; color: #94a3b8; border-color: #cbd5e1; }
+        
+        .step-content { padding-top: 1px; }
+        .step-name { font-size: 14px; font-weight: 700; color: var(--navy-dark); margin-bottom: 6px; }
+        .step-description { font-size: 13px; color: #475569; line-height: 1.6; }
+        
+        /* Interactive Control Triggers */
+        .blue-highlight-btn { background: var(--accent-blue); color: white; border: none; padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 10px; transition: background 0.15s; }
+        .blue-highlight-btn:hover { background: var(--accent-blue-dark); }
+        
+        .red-highlight-btn { background: var(--accent-red); color: white; border: none; padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 10px; transition: background 0.15s; }
+        .red-highlight-btn:hover { background: var(--accent-red-dark); }
+        
+        .action-btn { background: var(--success); color: white; border: none; padding: 12px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 15px; }
+        .action-btn:hover { background: #16a34a; }
+        .click-link { color: var(--accent-blue); font-weight: 600; cursor: pointer; text-decoration: none; background: none; border: none; }
+
+        /* Pop-up Modals System Layouts */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 12px; width: 550px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-muted); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-muted); border-radius: 6px; font-size: 13px; color: var(--navy-dark); background: var(--bg-light); }
+        
+        .step-callout { border-radius: 6px; padding: 12px; font-size: 12px; line-height: 1.5; margin-top: 15px; border: 1px solid var(--border-muted); background-color: #fffbeb; border-color: #fef3c7; color: #b45309; }
+        
+        /* Mini Tables Inside Modals */
+        .modal-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .modal-table th { background: #f1f5f9; font-size: 11px; font-weight: 700; color: #475569; padding: 6px 10px; text-align: left; }
+        .modal-table td { padding: 8px 10px; font-size: 12.5px; border-bottom: 1px solid var(--border-muted); }
+
+        .status-badge { display: inline-block; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 4px; text-transform: uppercase; background: #e0f2fe; color: #0369a1; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="feature-meta">Returning Student Lifecycle</div>
+        <div class="task-title">Student Re-Enrollment Process</div>
+
+        <main class="stepper-pane">
+            
+            <div class="step-block completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Identify Student Profile & Lock Context</div>
+                    <div class="step-description">
+                        Registrar queries the active database using the student's unique permanent identification index key to pull historic demographic records. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('search-modal', true)">Search Student ID (Walk-In)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block completed">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Review Automated Background Clearances</div>
+                    <div class="step-description">
+                        Open the evaluation interface registry to verify outstanding financial balances or programmatic academic blocks across prior terms. <br>
+                        <button type="button" class="red-highlight-btn" onclick="toggleModal('clearance-modal', true)">Open Student Clearance Registry</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block active">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Plot Semestral Course & Section Layout</div>
+                    <div class="step-description">
+                        Map out active time slots and configure subject choices face-to-face. The system layout engine dynamically checks section seat availability and core block dependencies. <br>
+                        <button type="button" class="red-highlight-btn" onclick="toggleModal('planner-modal', true)">Open Live Course Planner Screen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block pending">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-name">Commit Database State Change & Generate Invoice</div>
+                    <div class="step-description">Clicking the final verification validation button saves an atomic row change flag to update structural enrollment balances and instantly dispatches a new term assessment bill to the Cashier queue.</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="search-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">1. Global Record Lookup</h3>
+                <button type="button" class="click-link" onclick="toggleModal('search-modal', false)" style="font-size: 20px;">&times;</button>
+            </div>
+            <form onsubmit="event.preventDefault();">
+                <div class="form-group">
+                    <label>Enter Student ID Number</label>
+                    <input type="text" id="txt-student-id" placeholder="e.g., ID-2024-0872" value="ID-2024-0872">
+                </div>
+                <button type="button" class="action-btn" style="background: var(--accent-blue);" onclick="processSearch()">Fetch Profile Record</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="clearance-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">2. Automated Background Clearances</h3>
+                <button type="button" class="click-link" onclick="toggleModal('clearance-modal', false)" style="font-size: 20px;">&times;</button>
+            </div>
+            <table class="modal-table">
+                <thead>
+                    <tr>
+                        <th>Department Checkpoint</th>
+                        <th>Status Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Accounting & Finance Ledger</strong></td>
+                        <td><span class="status-badge" style="background: #dcfce7; color: #16a34a;">CLEARED_AUTO</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Academic Status Review</strong></td>
+                        <td><span class="status-badge" style="background: #dcfce7; color: #16a34a;">GOOD_STANDING</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="action-btn" style="background: var(--navy-dark);" onclick="toggleModal('clearance-modal', false)">Close Diagnostic View</button>
+        </div>
+    </div>
+
+    <div id="planner-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">3. Counter Schedule Planner Workspace</h3>
+                <button type="button" class="click-link" onclick="toggleModal('planner-modal', false)" style="font-size: 20px;">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Active Student Context</label>
+                <input type="text" value="Chelsea Colaljo (ID-2024-0872)" disabled style="font-weight: bold;">
+            </div>
+            <div class="form-group">
+                <label>Select Open Course Units Block</label>
+                <select>
+                    <option value="IT311">IT 311 - Advanced Database Systems (3.0 Units) [SEC-A]</option>
+                    <option value="IT312">IT 312 - Web Development Frameworks (3.0 Units) [SEC-B]</option>
+                </select>
+            </div>
+            <div class="step-callout">
+                <strong>System Validation Constraint:</strong> Saving changes commits an atomic matrix write. This instantly isolates the new term fees and routes the active invoice directly to the Cashier Terminal window queue array.
+            </div>
+            <button type="button" class="action-btn" onclick="commitReEnrollment()">Authorize & Save Semestral Term Row</button>
+        </div>
+    </div>
+
+    <script>
+        // Global Modal Display Controller Toggle Engine
+        function toggleModal(modalId, isVisible) {
+            const modal = document.getElementById(modalId);
+            if (isVisible) {
+                modal.classList.add('active');
+            } else {
+                modal.classList.remove('active');
+            }
+        }
+
+        function processSearch() {
+            const studentId = document.getElementById('txt-student-id').value;
+            alert(`Query Success!\n\nContext profile locked securely for key identifier: ${studentId}.\nMoving processing tracking cursor to clearance checkpoint.`);
+            toggleModal('search-modal', false);
+        }
+
+        function commitReEnrollment() {
+            alert(`Atomic Transaction Committed!\n\nPostgreSQL row parameters saved successfully.\nStudent state altered to ENROLLED_ACTIVE.\n\nFinancial ledger assessment data dispatched directly to the Cashier queue array.`);
+            toggleModal('planner-modal', false);
+        }
+    </script>
+</body>
+</html>
