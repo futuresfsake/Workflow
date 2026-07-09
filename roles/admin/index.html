@@ -1,106 +1,2002 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCCTEST Portal - System Admin Console</title>
-    <style>
-        :root {
-            --primary: #ef4444;
-            --primary-dark: #b91c1c;
-            --navy-dark: #0f172a;
-            --bg-light: #f8fafc;
-            --border: #cbd5e1;
-            --text: #334155;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text); display: flex; min-height: 100vh; }
-        
-        .sidebar { width: 250px; background-color: var(--navy-dark); color: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar h2 { font-size: 18px; margin-bottom: 25px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        .nav-item { padding: 12px; font-size: 13px; color: #94a3b8; border-radius: 6px; cursor: pointer; text-decoration: none; display: block; font-weight: 500; }
-        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.08); color: white; }
-        .back-btn { background-color: #334155; color: white; text-align: center; font-size: 12px; }
-        
-        .main-content { flex: 1; padding: 35px; overflow-y: auto; }
-        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 24px; color: var(--navy-dark); }
-        .role-tag { background-color: #fee2e2; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        
-        .card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .card h3 { font-size: 16px; color: var(--navy-dark); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
-        
-        .upload-area { border: 2px dashed var(--border); padding: 40px; text-align: center; background-color: var(--bg-light); border-radius: 8px; margin-bottom: 15px; }
-        .btn { padding: 10px 18px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background-color: var(--primary); color: white; }
-        .btn:hover { background-color: var(--primary-dark); }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
-        th { background-color: #f1f5f9; font-weight: 600; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCCTEST TMIS — Administrator Workflow Guide</title>
+<style>
+  :root{
+    --navy-dark:#0f172a;
+    --navy-soft:#16213e;
+    --primary-blue:#1e3a8a;
+    --accent-blue:#3b82f6;
+    --accent-blue-dark:#2563eb;
+    --bg-light:#f6f8fb;
+    --card-white:#ffffff;
+    --border-muted:#e2e8f0;
+    --text-main:#1e293b;
+    --text-soft:#64748b;
+    --text-faint:#94a3b8;
+    --success:#16a34a;
+    --success-bg:#ecfdf3;
+    --warning:#d97706;
+    --warning-bg:#fffaeb;
+    --danger:#dc2626;
+    --danger-bg:#fef2f2;
+    --info-bg:#eff6ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
+  body{background:var(--bg-light);color:var(--text-main);min-height:100vh;display:flex;overflow-x:hidden;}
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:300px;background:var(--navy-dark);color:#fff;
+    display:flex;flex-direction:column;
+    position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:20;
+    border-right:1px solid #1c2942;
+    transition:transform .25s ease;
+  }
+  .sidebar::-webkit-scrollbar{width:6px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#243258;border-radius:4px;}
+
+  .brand{padding:26px 22px 18px;border-bottom:1px solid #1c2942;}
+  .brand-mark{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .brand-logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--accent-blue),var(--primary-blue));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;}
+  .brand-mark h1{font-size:16px;font-weight:700;letter-spacing:-.2px;line-height:1.2;}
+  .brand-mark span{display:block;font-size:10.5px;color:var(--text-faint);font-weight:500;letter-spacing:.3px;margin-top:1px;}
+  .brand-tag{font-size:11px;color:#7c8bb0;background:#141d38;border:1px solid #243258;padding:6px 10px;border-radius:6px;display:inline-block;}
+
+  .nav-scroll{padding:16px 14px 30px;flex:1;}
+  .menu-group{margin-bottom:6px;}
+  .menu-group-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#5b6b8f;padding:10px 8px 8px;}
+  .menu-group-title svg{opacity:.65;}
+  .soon-tag{margin-left:auto;font-size:9px;font-weight:700;letter-spacing:.4px;background:#1c2942;color:#7c8bb0;padding:2px 6px;border-radius:20px;text-transform:none;}
+
+  .task-list{list-style:none;display:flex;flex-direction:column;gap:2px;margin-bottom:10px;}
+  .task-link{
+    padding:9px 12px 9px 34px;font-size:13px;border-radius:7px;color:#a9b6d3;
+    cursor:pointer;display:block;width:100%;text-align:left;border:none;background:none;
+    position:relative;transition:background .15s, color .15s;
+  }
+  .task-link:hover{background:rgba(255,255,255,.05);color:#f1f5f9;}
+  .task-link.active{background:var(--accent-blue);color:#fff;font-weight:600;}
+  .task-link.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#fff;border-radius:0 3px 3px 0;}
+  .task-link.dashboard-link{padding-left:12px;font-weight:600;font-size:13.5px;}
+  .task-link.disabled{color:#4b5978;cursor:not-allowed;}
+  .task-link.disabled:hover{background:none;color:#4b5978;}
+
+  .dot{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.7;}
+
+  .sidebar-footer{padding:14px 20px;border-top:1px solid #1c2942;font-size:11px;color:#5b6b8f;}
+
+  /* ---------- MAIN ---------- */
+  .main{flex:1;margin-left:300px;min-height:100vh;display:flex;flex-direction:column;width:calc(100% - 300px);}
+  .topbar{
+    background:var(--card-white);border-bottom:1px solid var(--border-muted);
+    padding:14px 34px;display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:5;
+  }
+  .breadcrumb{font-size:12.5px;color:var(--text-soft);display:flex;align-items:center;gap:6px;}
+  .breadcrumb b{color:var(--navy-dark);font-weight:700;}
+  .role-pill{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-soft);background:var(--bg-light);border:1px solid var(--border-muted);padding:6px 12px;border-radius:20px;}
+  .role-pill .avatar{width:22px;height:22px;border-radius:50%;background:var(--primary-blue);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+  .content-area{padding:34px 40px 80px;max-width:920px;width:100%;margin:0 auto;}
+
+  /* ---------- TASK HEADER ---------- */
+  .task-header{background:var(--card-white);border:1px solid var(--border-muted);border-radius:14px;padding:26px 28px;margin:0 auto 28px;max-width:760px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+  .task-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--accent-blue-dark);margin-bottom:8px;}
+  .task-title{font-size:23px;font-weight:800;color:var(--navy-dark);letter-spacing:-.3px;margin-bottom:8px;}
+  .task-desc{font-size:14px;color:var(--text-soft);line-height:1.6;margin-bottom:16px;max-width:640px;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .meta-chip{font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;display:flex;align-items:center;gap:6px;}
+  .meta-chip.time{background:var(--info-bg);color:var(--primary-blue);}
+  .meta-chip.prereq{background:#f1f5f9;color:var(--text-soft);font-weight:500;}
+
+  /* ---------- STEPS ---------- */
+  .steps{position:relative;max-width:760px;margin:0 auto;}
+  .step{display:flex;gap:16px;position:relative;padding-bottom:30px;}
+  .step:last-child{padding-bottom:0;}
+  .step:not(:last-child)::before{content:'';position:absolute;left:15px;top:34px;bottom:-2px;width:2px;background:var(--border-muted);}
+  .step-num{width:32px;height:32px;border-radius:50%;background:var(--primary-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;z-index:1;box-shadow:0 0 0 4px var(--bg-light);}
+  .step-body{flex:1;padding-top:3px;}
+  .step-title{font-weight:700;font-size:15px;color:var(--navy-dark);margin-bottom:5px;}
+  .step-desc{font-size:13.5px;color:#475569;line-height:1.6;margin-bottom:14px;}
+  .step-desc code{background:#f1f5f9;padding:1px 6px;border-radius:4px;font-size:12px;color:var(--primary-blue);}
+
+  .mockup-box{border:1.5px dashed #cbd5e1;background:#fbfcfe;border-radius:12px;padding:18px 20px;}
+  .mockup-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+  .mockup-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent-blue);}
+
+  /* ---------- GENERIC UI ELEMENTS (mockups) ---------- */
+  .ui-search{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .ui-input, .ui-select, .ui-textarea{
+    border:1px solid var(--border-muted);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text-main);background:#fff;outline:none;
+  }
+  .ui-input:focus, .ui-select:focus, .ui-textarea:focus{border-color:var(--accent-blue);box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+  .ui-input{flex:1;min-width:160px;}
+  .ui-textarea{width:100%;resize:vertical;min-height:64px;font-family:inherit;}
+
+  .btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:filter .15s, transform .05s;}
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--accent-blue);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.07);}
+  .btn-outline{background:#fff;border:1px solid var(--border-muted);color:var(--text-main);}
+  .btn-outline:hover{background:#f8fafc;}
+  .btn-success{background:var(--success);color:#fff;}
+  .btn-success:hover{filter:brightness(1.07);}
+  .btn-danger{background:var(--danger);color:#fff;}
+  .btn-danger:hover{filter:brightness(1.07);}
+  .btn-sm{padding:6px 12px;font-size:12px;}
+  .btn:disabled{opacity:.55;cursor:not-allowed;}
+
+  table.ui-table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;border:1px solid var(--border-muted);}
+  table.ui-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint);background:#f8fafc;padding:10px 14px;border-bottom:1px solid var(--border-muted);}
+  table.ui-table td{padding:11px 14px;font-size:13px;border-bottom:1px solid #f1f5f9;color:var(--text-main);vertical-align:middle;}
+  table.ui-table tr:last-child td{border-bottom:none;}
+  table.ui-table tr:hover td{background:#fafcff;}
+  .cell-name{font-weight:600;}
+  .cell-sub{font-size:11.5px;color:var(--text-faint);}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;}
+  .chip::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .chip-pending{background:var(--warning-bg);color:var(--warning);}
+  .chip-review{background:var(--info-bg);color:var(--accent-blue-dark);}
+  .chip-approved{background:var(--success-bg);color:var(--success);}
+  .chip-rejected{background:var(--danger-bg);color:var(--danger);}
+
+  .card{background:#fff;border:1px solid var(--border-muted);border-radius:12px;padding:18px 20px;}
+  .doc-list{display:flex;flex-direction:column;gap:9px;}
+  .doc-item{display:flex;align-items:center;justify-content:between;gap:10px;font-size:13px;padding:9px 12px;border:1px solid var(--border-muted);border-radius:8px;background:#fff;}
+  .doc-item .icon-ok{color:var(--success);font-weight:800;}
+  .doc-item .icon-bad{color:var(--danger);font-weight:800;}
+  .doc-item .doc-name{flex:1;}
+  .doc-item .doc-status{font-size:11.5px;font-weight:700;}
+
+  .info-note{display:flex;gap:10px;background:var(--info-bg);border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:12.5px;color:var(--primary-blue);line-height:1.55;}
+  .info-note b{display:block;font-size:12.5px;margin-bottom:2px;}
+
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border-muted);margin-bottom:16px;}
+  .tab-btn{background:none;border:none;padding:9px 14px;font-size:12.5px;font-weight:600;color:var(--text-soft);cursor:pointer;border-bottom:2px solid transparent;}
+  .tab-btn.active{color:var(--accent-blue-dark);border-bottom-color:var(--accent-blue);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;}
+  .kv{font-size:12.5px;}
+  .kv label{display:block;color:var(--text-faint);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+  .kv div.val{color:var(--text-main);font-weight:600;}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .modal-overlay.show{display:flex;}
+  .modal-card{background:#fff;border-radius:14px;max-width:480px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:pop .16s ease;}
+  @keyframes pop{from{transform:scale(.96);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border-muted);}
+  .modal-head h3{font-size:15.5px;font-weight:700;color:var(--navy-dark);}
+  .modal-close{background:none;border:none;font-size:18px;color:var(--text-faint);cursor:pointer;line-height:1;}
+  .modal-body{padding:20px 22px;}
+  .modal-foot{padding:16px 22px;border-top:1px solid var(--border-muted);display:flex;justify-content:flex-end;gap:10px;}
+  .modal-foot.split{justify-content:space-between;}
+
+  /* ---------- TOASTS ---------- */
+  .toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:200;}
+  .toast{min-width:280px;max-width:340px;background:var(--navy-dark);color:#fff;padding:13px 16px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:slidein .2s ease;border-left:4px solid var(--accent-blue);}
+  .toast.success{border-left-color:var(--success);}
+  .toast.danger{border-left-color:var(--danger);}
+  .toast.warning{border-left-color:var(--warning);}
+  .toast .t-icon{font-weight:800;}
+  @keyframes slidein{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+  .toast.fade-out{animation:fadeout .25s ease forwards;}
+  @keyframes fadeout{to{opacity:0;transform:translateX(20px);}}
+
+  /* ---------- DASHBOARD ---------- */
+  .dash-welcome{margin-bottom:24px;}
+  .dash-welcome h2{font-size:22px;font-weight:800;color:var(--navy-dark);letter-spacing:-.3px;margin-bottom:6px;}
+  .dash-welcome p{font-size:13.5px;color:var(--text-soft);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+  .stat-card{background:#fff;border:1px solid var(--border-muted);border-radius:12px;padding:18px;}
+  .stat-card .stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .stat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .stat-num{font-size:24px;font-weight:800;color:var(--navy-dark);margin-bottom:2px;}
+  .stat-label{font-size:11.5px;color:var(--text-faint);}
+  .stat-trend{font-size:11px;font-weight:700;margin-top:8px;}
+  .trend-up{color:var(--success);}
+  .trend-flat{color:var(--text-faint);}
+
+  .dash-section-title{font-size:13px;font-weight:700;color:var(--navy-dark);margin-bottom:12px;text-transform:uppercase;letter-spacing:.4px;}
+  .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+  .qa-btn{background:#fff;border:1px solid var(--border-muted);border-radius:12px;padding:16px 14px;text-align:left;cursor:pointer;transition:border-color .15s, transform .05s;}
+  .qa-btn:hover{border-color:var(--accent-blue);}
+  .qa-btn:active{transform:scale(.98);}
+  .qa-btn .qa-icon{font-size:18px;margin-bottom:8px;}
+  .qa-btn .qa-title{font-size:12.5px;font-weight:700;color:var(--navy-dark);margin-bottom:2px;}
+  .qa-btn .qa-sub{font-size:11px;color:var(--text-faint);}
+  .qa-btn.locked{opacity:.5;cursor:not-allowed;}
+
+  .activity-list{background:#fff;border:1px solid var(--border-muted);border-radius:12px;overflow:hidden;}
+  .activity-item{display:flex;gap:12px;padding:13px 18px;border-bottom:1px solid #f1f5f9;font-size:13px;}
+  .activity-item:last-child{border-bottom:none;}
+  .activity-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .activity-text b{color:var(--navy-dark);}
+  .activity-time{margin-left:auto;font-size:11.5px;color:var(--text-faint);white-space:nowrap;}
+
+  .disclaimer{margin-top:24px;font-size:11.5px;color:var(--text-faint);text-align:center;}
+
+  /* ---------- MOBILE ---------- */
+  .menu-toggle{display:none;position:fixed;top:14px;left:14px;z-index:30;background:var(--navy-dark);color:#fff;border:none;width:38px;height:38px;border-radius:8px;font-size:16px;cursor:pointer;}
+  @media (max-width:920px){
+    .sidebar{transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0;width:100%;}
+    .menu-toggle{display:block;}
+    .content-area{padding:70px 18px 60px;}
+    .stat-grid, .quick-actions{grid-template-columns:repeat(2,1fr);}
+    .kv-grid{grid-template-columns:1fr;}
+  }
+</style>
 </head>
 <body>
-    <div class="sidebar">
-        <div>
-            <h2>MCCTEST Admin</h2>
-            <nav class="nav-links">
-                <a href="#" class="nav-item active">Data Migration Tool</a>
-                <a href="#" class="nav-item">System Access Controls</a>
-                <a href="#" class="nav-item">Audit Trail Logs</a>
-                <a href="#" class="nav-item">Database Configuration</a>
-            </nav>
-        </div>
-        <a href="../../index.html" class="nav-item back-btn">➔ Back to Portal Gateway</a>
-    </div>
-    <div class="main-content">
-        <div class="header">
-            <div>
-                <h1>System Infrastructure Management</h1>
-                <p style="font-size: 13px; color: #64748b;">Enterprise records migration and transaction mapping boundaries.</p>
-            </div>
-            <span class="role-tag">SYSTEM ADMIN CONSOLE</span>
-        </div>
-        
-        <div class="card">
-            <h3>Automated Legacy Data Ingestion Tool</h3>
-            <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Upload institutional historical records spreadsheets (.xlsx or .csv) to securely parse structural items straight into PostgreSQL tables.</p>
-            <div class="upload-area">
-                <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Drag and drop legacy database sheets here</p>
-                <button class="btn" onclick="alert('Parsing legacy matrix rows asynchronously using Zod verification rules...');">Browse File Matrix</button>
-            </div>
-        </div>
 
-        <div class="card">
-            <h3>Live Global Transaction Audit Ledger</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Sequence ID</th>
-                        <th>User Account</th>
-                        <th>Role Node</th>
-                        <th>Triggered Operation Pipeline</th>
-                        <th>Database Execution Result</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>#TX-90211</code></td>
-                        <td>Maria Santos</td>
-                        <td>REGISTRAR</td>
-                        <td><code>INSERT INTO enrollees (uli, fullname)</code></td>
-                        <td><span style="color:green; font-weight:bold;">COMMIT SUCCESS</span></td>
-                    </tr>
-                <tr>
-                        <td><code>#TX-90210</code></td>
-                        <td>Engr. Juan Dela Cruz</td>
-                        <td>TRAINER</td>
-                        <td><code>UPDATE batch_rost_checklist SET status='C'</code></td>
-                        <td><span style="color:green; font-weight:bold;">COMMIT SUCCESS</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">
+      <div class="brand-logo">MC</div>
+      <div>
+        <h1>MCCTEST TMIS</h1>
+        <span>Administrator Guide</span>
+      </div>
     </div>
+    <span class="brand-tag">Simulated Environment — No live data</span>
+  </div>
+
+  <nav class="nav-scroll">
+    <ul class="task-list">
+      <li><button type="button" class="task-link dashboard-link" onclick="window.location.href='../../index.html'">↩&nbsp;&nbsp;Return to Landing Page</button></li>
+      <li><button class="task-link dashboard-link active" data-module="dashboard" data-task="dashboard" onclick="handleNavClick(this)">🏠&nbsp;&nbsp;Dashboard</button></li>
+    </ul>
+
+    <div class="menu-group">
+      <div class="menu-group-title">Admission Management</div>
+      <ul class="task-list">
+        <li><button class="task-link" data-module="admission" data-task="review" onclick="handleNavClick(this)"><span class="dot"></span>Review Applications</button></li>
+        <li><button class="task-link" data-module="admission" data-task="approve" onclick="handleNavClick(this)"><span class="dot"></span>Approve Application</button></li>
+        <li><button class="task-link" data-module="admission" data-task="reject" onclick="handleNavClick(this)"><span class="dot"></span>Reject Application</button></li>
+      </ul>
+    </div>
+
+    <div class="menu-group">
+      <div class="menu-group-title">Enrollment Management</div>
+      <ul class="task-list">
+        <li><button class="task-link" data-module="enrollment" data-task="enroll" onclick="handleNavClick(this)"><span class="dot"></span>Enroll Student</button></li>
+        <li><button class="task-link" data-module="enrollment" data-task="assign-id" onclick="handleNavClick(this)"><span class="dot"></span>Assign Student ID</button></li>
+        <li><button class="task-link" data-module="enrollment" data-task="print-form" onclick="handleNavClick(this)"><span class="dot"></span>Print Enrollment Form</button></li>
+      </ul>
+    </div>
+
+    <div class="menu-group">
+      <div class="menu-group-title">Training Management</div>
+      <ul class="task-list">
+        <li><button class="task-link" data-module="training" data-task="create-program" onclick="handleNavClick(this)"><span class="dot"></span>Create Training Program</button></li>
+        <li><button class="task-link" data-module="training" data-task="assign-trainer" onclick="handleNavClick(this)"><span class="dot"></span>Assign Trainer</button></li>
+        <li><button class="task-link" data-module="training" data-task="manage-schedule" onclick="handleNavClick(this)"><span class="dot"></span>Manage Training Schedule</button></li>
+      </ul>
+    </div>
+
+    <div class="menu-group">
+      <div class="menu-group-title">Certificate Management</div>
+      <ul class="task-list">
+        <li><button class="task-link" data-module="certificate" data-task="generate" onclick="handleNavClick(this)"><span class="dot"></span>Generate Certificate</button></li>
+        <li><button class="task-link" data-module="certificate" data-task="reprint" onclick="handleNavClick(this)"><span class="dot"></span>Reprint Certificate</button></li>
+      </ul>
+    </div>
+
+    <div class="menu-group">
+      <div class="menu-group-title">Reports</div>
+      <ul class="task-list">
+        <li><button class="task-link" data-module="reports" data-task="completers" onclick="handleNavClick(this)"><span class="dot"></span>Generate Completers Report</button></li>
+        <li><button class="task-link" data-module="reports" data-task="enrollment" onclick="handleNavClick(this)"><span class="dot"></span>Generate Enrollment Report</button></li>
+        <li><button class="task-link" data-module="reports" data-task="employment" onclick="handleNavClick(this)"><span class="dot"></span>Generate Employment Report</button></li>
+        <li><button class="task-link" data-module="reports" data-task="terminal" onclick="handleNavClick(this)"><span class="dot"></span>Generate Terminal Report</button></li>
+      </ul>
+    </div>
+
+    <div class="menu-group">
+      <div class="menu-group-title">User Management</div>
+      <ul class="task-list">
+        <li><button class="task-link" data-module="users" data-task="add" onclick="handleNavClick(this)"><span class="dot"></span>Add User</button></li>
+        <li><button class="task-link" data-module="users" data-task="edit" onclick="handleNavClick(this)"><span class="dot"></span>Edit User</button></li>
+        <li><button class="task-link" data-module="users" data-task="disable" onclick="handleNavClick(this)"><span class="dot"></span>Disable User</button></li>
+        <li><button class="task-link" data-module="users" data-task="reset" onclick="handleNavClick(this)"><span class="dot"></span>Reset Password</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">MCCTEST Capstone Prototype · v0.1</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="breadcrumb" id="breadcrumb"><b>Dashboard</b></div>
+    <div class="role-pill"><div class="avatar">A</div> Admin Session (Simulated)</div>
+  </div>
+  <div class="content-area" id="task-content"></div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card" id="modal-card"></div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+function handleNavClick(el){
+  document.querySelectorAll('.task-link').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const mod = el.dataset.module, task = el.dataset.task;
+  renderRoute(mod, task);
+  document.querySelector('.sidebar').classList.remove('open');
+  document.querySelector('.content-area').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function navigateTo(mod, task){
+  const el = document.querySelector(`.task-link[data-module="${mod}"][data-task="${task}"]`);
+  if(el){ handleNavClick(el); }
+}
+
+function renderRoute(mod, task){
+  const crumb = document.getElementById('breadcrumb');
+  const content = document.getElementById('task-content');
+  if(mod==='dashboard'){
+    crumb.innerHTML = '<b>Dashboard</b>';
+    content.innerHTML = renderDashboard();
+  } else if(mod==='admission' && task==='review'){
+    crumb.innerHTML = 'Admission Management &nbsp;/&nbsp; <b>Review Applications</b>';
+    content.innerHTML = renderReviewApplications();
+    raRenderTable();
+  } else if(mod==='admission' && task==='approve'){
+    crumb.innerHTML = 'Admission Management &nbsp;/&nbsp; <b>Approve Application</b>';
+    content.innerHTML = renderApproveApplication();
+  } else if(mod==='admission' && task==='reject'){
+    crumb.innerHTML = 'Admission Management &nbsp;/&nbsp; <b>Reject Application</b>';
+    content.innerHTML = renderRejectApplication();
+  } else if(mod==='enrollment' && task==='enroll'){
+    crumb.innerHTML = 'Enrollment Management &nbsp;/&nbsp; <b>Enroll Student</b>';
+    content.innerHTML = renderEnrollStudent();
+  } else if(mod==='enrollment' && task==='assign-id'){
+    crumb.innerHTML = 'Enrollment Management &nbsp;/&nbsp; <b>Assign Student ID</b>';
+    content.innerHTML = renderAssignStudentID();
+  } else if(mod==='enrollment' && task==='print-form'){
+    crumb.innerHTML = 'Enrollment Management &nbsp;/&nbsp; <b>Print Enrollment Form</b>';
+    content.innerHTML = renderPrintEnrollmentForm();
+  } else if(mod==='certificate' && task==='generate'){
+    crumb.innerHTML = 'Certificate Management &nbsp;/&nbsp; <b>Generate Certificate</b>';
+    content.innerHTML = renderGenerateCertificate();
+  } else if(mod==='certificate' && task==='reprint'){
+    crumb.innerHTML = 'Certificate Management &nbsp;/&nbsp; <b>Reprint Certificate</b>';
+    content.innerHTML = renderReprintCertificate();
+  } else if(mod==='reports' && task==='completers'){
+    crumb.innerHTML = 'Reports &nbsp;/&nbsp; <b>Generate Completers Report</b>';
+    content.innerHTML = renderCompletersReport();
+  } else if(mod==='reports' && task==='enrollment'){
+    crumb.innerHTML = 'Reports &nbsp;/&nbsp; <b>Generate Enrollment Report</b>';
+    content.innerHTML = renderEnrollmentReport();
+  } else if(mod==='reports' && task==='employment'){
+    crumb.innerHTML = 'Reports &nbsp;/&nbsp; <b>Generate Employment Report</b>';
+    content.innerHTML = renderEmploymentReport();
+  } else if(mod==='reports' && task==='terminal'){
+    crumb.innerHTML = 'Reports &nbsp;/&nbsp; <b>Generate Terminal Report</b>';
+    content.innerHTML = renderTerminalReport();
+  } else if(mod==='training' && task==='create-program'){
+    crumb.innerHTML = 'Training Management &nbsp;/&nbsp; <b>Create Training Program</b>';
+    content.innerHTML = renderCreateTrainingProgram();
+  } else if(mod==='training' && task==='assign-trainer'){
+    crumb.innerHTML = 'Training Management &nbsp;/&nbsp; <b>Assign Trainer</b>';
+    content.innerHTML = renderAssignTrainer();
+  } else if(mod==='training' && task==='manage-schedule'){
+    crumb.innerHTML = 'Training Management &nbsp;/&nbsp; <b>Manage Training Schedule</b>';
+    content.innerHTML = renderManageTrainingSchedule();
+  } else if(mod==='users' && task==='add'){
+    crumb.innerHTML = 'User Management &nbsp;/&nbsp; <b>Add User</b>';
+    content.innerHTML = renderAddUser();
+  } else if(mod==='users' && task==='edit'){
+    crumb.innerHTML = 'User Management &nbsp;/&nbsp; <b>Edit User</b>';
+    content.innerHTML = renderEditUser();
+  } else if(mod==='users' && task==='disable'){
+    crumb.innerHTML = 'User Management &nbsp;/&nbsp; <b>Disable User</b>';
+    content.innerHTML = renderDisableUser();
+  } else if(mod==='users' && task==='reset'){
+    crumb.innerHTML = 'User Management &nbsp;/&nbsp; <b>Reset Password</b>';
+    content.innerHTML = renderResetPassword();
+  }
+}
+
+/* =========================================================
+   MODAL + TOAST UTILITIES
+   ========================================================= */
+function openModal(html){
+  document.getElementById('modal-card').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+function showToast(msg, type){
+  type = type || 'success';
+  const icons = {success:'✓', danger:'✕', warning:'!', info:'i'};
+  const c = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = `<span class="t-icon">${icons[type]||'✓'}</span><span>${msg}</span>`;
+  c.appendChild(el);
+  setTimeout(()=>{
+    el.classList.add('fade-out');
+    setTimeout(()=>el.remove(), 250);
+  }, 3200);
+}
+
+/* =========================================================
+   SHARED HEADER BUILDER
+   ========================================================= */
+function taskHeader(eyebrow, title, desc, time, prereqs){
+  return `
+    <div class="task-header">
+      <div class="task-eyebrow">${eyebrow}</div>
+      <div class="task-title">${title}</div>
+      <div class="task-desc">${desc}</div>
+      <div class="meta-row">
+        <div class="meta-chip time">⏱ ${time}</div>
+        ${prereqs.map(p=>`<div class="meta-chip prereq">📋 ${p}</div>`).join('')}
+      </div>
+    </div>`;
+}
+
+/* =========================================================
+   DASHBOARD MODULE
+   ========================================================= */
+function renderDashboard(){
+  return `
+    <div class="dash-welcome">
+      <h2>Welcome back, Admin 👋</h2>
+      <p>Here's a simulated overview of today's admission and training activity across MCCTEST.</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <div class="stat-num">128</div>
+            <div class="stat-label">Total Applicants</div>
+          </div>
+          <div class="stat-icon" style="background:var(--info-bg);">📥</div>
+        </div>
+        <div class="stat-trend trend-up">▲ 12 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <div class="stat-num">17</div>
+            <div class="stat-label">Pending Approvals</div>
+          </div>
+          <div class="stat-icon" style="background:var(--warning-bg);">⏳</div>
+        </div>
+        <div class="stat-trend trend-flat">Needs review</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <div class="stat-num">342</div>
+            <div class="stat-label">Active Trainees</div>
+          </div>
+          <div class="stat-icon" style="background:var(--success-bg);">🎓</div>
+        </div>
+        <div class="stat-trend trend-up">▲ 5 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <div class="stat-num">96</div>
+            <div class="stat-label">Certificates Issued</div>
+          </div>
+          <div class="stat-icon" style="background:#f1f5f9;">🏅</div>
+        </div>
+        <div class="stat-trend trend-flat">This quarter</div>
+      </div>
+    </div>
+
+    <div class="dash-section-title">Quick Actions</div>
+    <div class="quick-actions">
+      <button class="qa-btn" onclick="navigateTo('admission','review')">
+        <div class="qa-icon">🔍</div>
+        <div class="qa-title">Review Applications</div>
+        <div class="qa-sub">Admission Management</div>
+      </button>
+      <button class="qa-btn" onclick="navigateTo('enrollment','enroll')">
+        <div class="qa-icon">🧾</div>
+        <div class="qa-title">Enroll Student</div>
+        <div class="qa-sub">Enrollment Management</div>
+      </button>
+      <button class="qa-btn" onclick="navigateTo('training','create-program')">
+        <div class="qa-icon">📅</div>
+        <div class="qa-title">Create Training</div>
+        <div class="qa-sub">Training Management</div>
+      </button>
+      <button class="qa-btn" onclick="navigateTo('reports','completers')">
+        <div class="qa-icon">📊</div>
+        <div class="qa-title">Generate Report</div>
+        <div class="qa-sub">Reports</div>
+      </button>
+    </div>
+
+    <div class="dash-section-title">Recent Activity</div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="activity-dot" style="background:var(--success);"></div>
+        <div class="activity-text"><b>Application approved</b> for Juan Cruz — Culinary Arts NC II</div>
+        <div class="activity-time">10 min ago</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:var(--accent-blue);"></div>
+        <div class="activity-text"><b>New application submitted</b> by Ana Reyes</div>
+        <div class="activity-time">42 min ago</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:var(--danger);"></div>
+        <div class="activity-text"><b>Application rejected</b> for Mark Villanueva — incomplete documents</div>
+        <div class="activity-time">1 hr ago</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-dot" style="background:var(--text-faint);"></div>
+        <div class="activity-text"><b>Remarks added</b> to Maria Santos' application</div>
+        <div class="activity-time">2 hrs ago</div>
+      </div>
+    </div>
+
+    <div class="disclaimer">All figures and activity shown are simulated for demonstration purposes only.</div>
+  `;
+}
+
+/* =========================================================
+   ADMISSION MANAGEMENT — REVIEW APPLICATIONS
+   ========================================================= */
+let raApplicants = [
+  {id:1, name:'Maria Santos', program:'Culinary Arts NC II', submitted:'July 1, 2026', status:'pending',
+    phone:'0917 234 5566', email:'maria.santos@email.com', guardian:'Elena Santos',
+    documents:[{name:'Birth Certificate', ok:true},{name:'Report Card / TOR', ok:true},{name:'2x2 ID Photo', ok:false},{name:'Barangay Clearance', ok:true}],
+    remarks:''},
+  {id:2, name:'Juan Cruz', program:'Electrical Installation NC II', submitted:'July 2, 2026', status:'review',
+    phone:'0918 555 1122', email:'juan.cruz@email.com', guardian:'Roberto Cruz',
+    documents:[{name:'Birth Certificate', ok:true},{name:'Report Card / TOR', ok:true},{name:'2x2 ID Photo', ok:true},{name:'Barangay Clearance', ok:true}],
+    remarks:'All documents verified. Ready for decision.'},
+  {id:3, name:'Ana Reyes', program:'Bread & Pastry Production NC II', submitted:'July 3, 2026', status:'pending',
+    phone:'0919 888 3344', email:'ana.reyes@email.com', guardian:'Liza Reyes',
+    documents:[{name:'Birth Certificate', ok:true},{name:'Report Card / TOR', ok:false},{name:'2x2 ID Photo', ok:true},{name:'Barangay Clearance', ok:true}],
+    remarks:''},
+  {id:4, name:'Mark Villanueva', program:'Computer Systems Servicing NC II', submitted:'July 3, 2026', status:'review',
+    phone:'0920 112 9988', email:'mark.v@email.com', guardian:'Nora Villanueva',
+    documents:[{name:'Birth Certificate', ok:true},{name:'Report Card / TOR', ok:true},{name:'2x2 ID Photo', ok:true},{name:'Barangay Clearance', ok:false}],
+    remarks:'Missing barangay clearance, applicant notified.'},
+  {id:5, name:'Liza Bautista', program:'Culinary Arts NC II', submitted:'July 4, 2026', status:'pending',
+    phone:'0921 777 4433', email:'liza.b@email.com', guardian:'Carmen Bautista',
+    documents:[{name:'Birth Certificate', ok:true},{name:'Report Card / TOR', ok:true},{name:'2x2 ID Photo', ok:true},{name:'Barangay Clearance', ok:true}],
+    remarks:''}
+];
+
+function raChipHTML(status){
+  const map = {pending:['chip-pending','Pending'], review:['chip-review','Under Review'], approved:['chip-approved','Approved'], rejected:['chip-rejected','Rejected']};
+  const [cls,label] = map[status];
+  return `<span class="chip ${cls}">${label}</span>`;
+}
+
+function renderReviewApplications(){
+  return `
+    ${taskHeader('Admission Management','Review Applications',
+      'Browse newly submitted applications, verify requirements, and prepare each one for an approval or rejection decision.',
+      '5–10 minutes', ['Applicant has submitted the online admission form'])}
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Open the Admission Management module</div>
+          <div class="step-desc">From the sidebar, select <code>Admission Management → Review Applications</code> to open the list of submitted applicants.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Search or filter the applicant list</div>
+          <div class="step-desc">Use the search box to find an applicant by name, or filter by status to focus on applications that still need action.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <div class="ui-search">
+              <input type="text" class="ui-input" id="ra-search" placeholder="Search applicant name..." oninput="raRenderTable()">
+              <select class="ui-select" id="ra-filter" onchange="raRenderTable()">
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="review">Under Review</option>
+              </select>
+            </div>
+            <table class="ui-table">
+              <thead><tr><th>Applicant</th><th>Program</th><th>Status</th><th></th></tr></thead>
+              <tbody id="ra-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Understand what each status means</div>
+          <div class="step-desc">Status chips tell you where each applicant stands in the pipeline before any decision is made.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Status Legend</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              ${raChipHTML('pending')} <span style="font-size:12px;color:var(--text-soft);margin-right:14px;">— just submitted, not yet opened</span>
+              ${raChipHTML('review')} <span style="font-size:12px;color:var(--text-soft);">— opened and being verified</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Open an applicant's details</div>
+          <div class="step-desc">Click <code>View</code> on any row to open the applicant's full profile in a detail window, without leaving the list.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Verify submitted documents</div>
+          <div class="step-desc">Inside the detail window, switch to the Documents tab to confirm every requirement has been uploaded before proceeding.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">Add internal remarks</div>
+          <div class="step-desc">Leave a short note for the record — for example, flagging a missing document — so other staff understand the application's history.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <div class="step-title">Decide the next action</div>
+          <div class="step-desc">Once verified, choose to move the applicant forward or send them back. These decisions are handled in the <code>Approve Application</code> and <code>Reject Application</code> workflows.</div>
+          <div class="info-note">
+            <div><b>Tip</b>This step only routes the decision — the actual status change happens in the dedicated Approve or Reject workflow, which you can open from the sidebar.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+function raRenderTable(){
+  const body = document.getElementById('ra-table-body');
+  if(!body) return;
+  const search = (document.getElementById('ra-search')?.value || '').toLowerCase();
+  const filter = document.getElementById('ra-filter')?.value || 'all';
+  const rows = raApplicants.filter(a=>{
+    const matchesSearch = a.name.toLowerCase().includes(search);
+    const matchesFilter = filter==='all' || a.status===filter;
+    return matchesSearch && matchesFilter;
+  });
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--text-faint);padding:22px;">No applicants match your search.</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(a=>`
+    <tr>
+      <td><div class="cell-name">${a.name}</div><div class="cell-sub">Submitted ${a.submitted}</div></td>
+      <td>${a.program}</td>
+      <td>${raChipHTML(a.status)}</td>
+      <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="raOpenModal(${a.id})">View</button></td>
+    </tr>
+  `).join('');
+}
+
+function raOpenModal(id){
+  const a = raApplicants.find(x=>x.id===id);
+  if(!a) return;
+  openModal(`
+    <div class="modal-head">
+      <h3>${a.name}</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs">
+        <button class="tab-btn active" id="ra-tab-btn-personal" onclick="raSwitchTab('personal')">Personal Info</button>
+        <button class="tab-btn" id="ra-tab-btn-documents" onclick="raSwitchTab('documents')">Documents</button>
+        <button class="tab-btn" id="ra-tab-btn-remarks" onclick="raSwitchTab('remarks')">Remarks</button>
+      </div>
+
+      <div class="tab-panel active" id="ra-tab-personal">
+        <div class="kv-grid">
+          <div class="kv"><label>Program Applied</label><div class="val">${a.program}</div></div>
+          <div class="kv"><label>Status</label><div class="val">${raChipHTML(a.status)}</div></div>
+          <div class="kv"><label>Phone</label><div class="val">${a.phone}</div></div>
+          <div class="kv"><label>Email</label><div class="val">${a.email}</div></div>
+          <div class="kv"><label>Guardian</label><div class="val">${a.guardian}</div></div>
+          <div class="kv"><label>Date Submitted</label><div class="val">${a.submitted}</div></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="ra-tab-documents">
+        <div class="doc-list">
+          ${a.documents.map(d=>`
+            <div class="doc-item">
+              <span class="${d.ok?'icon-ok':'icon-bad'}">${d.ok?'✓':'✕'}</span>
+              <span class="doc-name">${d.name}</span>
+              <span class="doc-status" style="color:${d.ok?'var(--success)':'var(--danger)'}">${d.ok?'Uploaded':'Missing'}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="tab-panel" id="ra-tab-remarks">
+        <textarea class="ui-textarea" id="ra-remarks-input" placeholder="Add an internal remark...">${a.remarks}</textarea>
+        <div style="margin-top:10px;text-align:right;">
+          <button class="btn btn-primary btn-sm" onclick="raSaveRemarks(${a.id})">Save Remarks</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot split">
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-danger" onclick="raDecision('rejected')">Send to Reject</button>
+        <button class="btn btn-success" onclick="raDecision('approved')">Send to Approve</button>
+      </div>
+    </div>
+  `);
+}
+
+function raSwitchTab(tab){
+  ['personal','documents','remarks'].forEach(t=>{
+    document.getElementById('ra-tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('ra-tab-btn-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+function raSaveRemarks(id){
+  const a = raApplicants.find(x=>x.id===id);
+  const val = document.getElementById('ra-remarks-input').value;
+  if(a) a.remarks = val;
+  showToast('Remarks saved to applicant record.', 'success');
+}
+
+function raDecision(direction){
+  closeModal();
+  if(direction==='approved'){
+    showToast('Routed to the Approve Application workflow (simulated).', 'success');
+  } else {
+    showToast('Routed to the Reject Application workflow (simulated).', 'warning');
+  }
+}
+
+/* =========================================================
+   ADMISSION MANAGEMENT — APPROVE APPLICATION
+   ========================================================= */
+function renderApproveApplication(){
+  return `
+    ${taskHeader('Admission Management','Approve Application',
+      'Approve a reviewed applicant to officially advance them toward enrollment.',
+      '2–3 minutes', ['Application has already been reviewed and verified'])}
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Locate the reviewed applicant</div>
+          <div class="step-desc">Applicants marked <code>Under Review</code> are ready for a decision. Here is a sample record pulled from the Review Applications list.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <div class="card" id="aa-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div>
+                  <div class="cell-name" style="font-size:14px;">Juan Cruz</div>
+                  <div class="cell-sub">Electrical Installation NC II · Submitted July 2, 2026</div>
+                </div>
+                <span class="chip chip-review" id="aa-status">Under Review</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Click Approve Application</div>
+          <div class="step-desc">This starts the approval action for the selected applicant.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" id="aa-approve-btn" onclick="aaConfirm()">Approve Application</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Confirm the approval</div>
+          <div class="step-desc">A confirmation dialog appears to prevent accidental approvals — this action cannot be undone once submitted in the real system.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Status updates automatically</div>
+          <div class="step-desc">Once confirmed, the applicant's status chip changes to <code>Approved</code> and the approve button is disabled to prevent duplicate actions.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">A confirmation toast appears</div>
+          <div class="step-desc">A brief notification confirms the action succeeded, matching the feedback pattern used throughout the system.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">Applicant moves toward enrollment</div>
+          <div class="step-desc">Approved applicants become eligible for the Enrollment Management module, where a Student ID is generated.</div>
+          <div class="info-note">
+            <div><b>What happens next</b>In the full system, this would automatically queue the applicant for <code>Enrollment Management → Enroll Student</code>.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+function aaConfirm(){
+  openModal(`
+    <div class="modal-head">
+      <h3>Approve this application?</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--text-soft);line-height:1.6;">
+        You are about to approve <b style="color:var(--navy-dark);">Juan Cruz's</b> application for
+        <b style="color:var(--navy-dark);">Electrical Installation NC II</b>. This will move the applicant forward to enrollment.
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="aaApprove()">Yes, Approve</button>
+    </div>
+  `);
+}
+
+function aaApprove(){
+  closeModal();
+  const chip = document.getElementById('aa-status');
+  const btn = document.getElementById('aa-approve-btn');
+  if(chip){ chip.className='chip chip-approved'; chip.textContent='Approved'; }
+  if(btn){ btn.disabled = true; btn.textContent = 'Approved'; }
+  showToast('Application approved. Student ID generation queued (simulated).', 'success');
+}
+
+/* =========================================================
+   ADMISSION MANAGEMENT — REJECT APPLICATION
+   ========================================================= */
+function renderRejectApplication(){
+  return `
+    ${taskHeader('Admission Management','Reject Application',
+      'Decline an application that does not meet requirements, with a documented reason for the record.',
+      '2–4 minutes', ['Application has already been reviewed', 'A valid rejection reason is available'])}
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Locate the applicant to reject</div>
+          <div class="step-desc">Here is a sample record with missing requirements, similar to what you'd see in the Review Applications list.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <div class="card" id="ja-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div>
+                  <div class="cell-name" style="font-size:14px;">Mark Villanueva</div>
+                  <div class="cell-sub">Computer Systems Servicing NC II · Missing barangay clearance</div>
+                </div>
+                <span class="chip chip-review" id="ja-status">Under Review</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Click Reject Application</div>
+          <div class="step-desc">This opens a form to record why the application is being declined.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-danger" id="ja-reject-btn" onclick="jaOpenModal()">Reject Application</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Select a rejection reason</div>
+          <div class="step-desc">Choose the closest matching reason from the dropdown so the applicant receives an accurate explanation.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Add optional notes</div>
+          <div class="step-desc">Include any extra detail — for example, which document is missing — to help the applicant correct and resubmit later.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Confirm the rejection</div>
+          <div class="step-desc">Since rejection is difficult to reverse, a second confirmation step is required before it's final.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">Status updates and a toast confirms</div>
+          <div class="step-desc">The applicant's chip turns to <code>Rejected</code> and a toast notification confirms the action was recorded.</div>
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+function jaOpenModal(){
+  openModal(`
+    <div class="modal-head">
+      <h3>Reject Application</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:11.5px;font-weight:700;color:var(--text-soft);margin-bottom:6px;">Rejection Reason</label>
+        <select class="ui-select" id="ja-reason" style="width:100%;">
+          <option value="">Select a reason...</option>
+          <option value="incomplete">Incomplete Documents</option>
+          <option value="requirements">Does Not Meet Program Requirements</option>
+          <option value="duplicate">Duplicate Application</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:11.5px;font-weight:700;color:var(--text-soft);margin-bottom:6px;">Notes (optional)</label>
+        <textarea class="ui-textarea" id="ja-notes" placeholder="e.g. Barangay clearance was not submitted."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="jaConfirmStep()">Continue</button>
+    </div>
+  `);
+}
+
+function jaConfirmStep(){
+  const reason = document.getElementById('ja-reason').value;
+  if(!reason){
+    showToast('Please select a rejection reason first.', 'warning');
+    return;
+  }
+  const notes = document.getElementById('ja-notes').value;
+  openModal(`
+    <div class="modal-head">
+      <h3>Are you sure?</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--text-soft);line-height:1.6;">
+        This will reject <b style="color:var(--navy-dark);">Mark Villanueva's</b> application. This action cannot be undone (simulated).
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="jaReject('${reason}')">Yes, Reject</button>
+    </div>
+  `);
+}
+
+function jaReject(reason){
+  closeModal();
+  const chip = document.getElementById('ja-status');
+  const btn = document.getElementById('ja-reject-btn');
+  if(chip){ chip.className='chip chip-rejected'; chip.textContent='Rejected'; }
+  if(btn){ btn.disabled = true; btn.textContent = 'Rejected'; }
+  showToast('Application rejected. Applicant will be notified.', 'danger');
+}
+
+/* =========================================================
+   ENROLLMENT MANAGEMENT
+   ========================================================= */
+function renderEnrollStudent(){
+  return `
+    ${taskHeader('Enrollment Management','Enroll Student',
+      'Move an approved applicant into the active student roster and prepare them for training attendance.',
+      '3–5 minutes', ['Applicant has already been approved'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Open the enrollment queue</div>
+          <div class="step-desc">From the sidebar, choose <code>Enrollment Management → Enroll Student</code> to open the list of approved applicants.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Select the student to enroll</div>
+          <div class="step-desc">Pick the applicant whose admission has already been approved and whose records are ready for the next stage.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <table class="ui-table">
+              <thead><tr><th>Student</th><th>Program</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="cell-name">Juan Cruz</div><div class="cell-sub">Approved applicant</div></td>
+                  <td>Electrical Installation NC II</td>
+                  <td><span class="chip chip-approved">Approved</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="showToast('Applicant selected for enrollment.','info')">Select</button></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-name">Ana Reyes</div><div class="cell-sub">Approved applicant</div></td>
+                  <td>Bread & Pastry Production NC II</td>
+                  <td><span class="chip chip-approved">Approved</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="showToast('Applicant selected for enrollment.','info')">Select</button></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-name">Mark Villanueva</div><div class="cell-sub">Missing documents</div></td>
+                  <td>Computer Systems Servicing NC II</td>
+                  <td><span class="chip chip-pending">Pending</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="showToast('Cannot enroll: required documents are incomplete.','warning')">Blocked</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Review the enrollment details</div>
+          <div class="step-desc">Confirm program, batch, and schedule before moving the student into the active roster.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Enrollment Summary</div>
+            <div class="card">
+              <div class="cell-name" style="font-size:14px;">Juan Cruz</div>
+              <div class="cell-sub">Program: Electrical Installation NC II</div>
+              <div class="cell-sub">Batch: July 2026 · Room 204</div>
+              <div style="margin-top:12px;"><button class="btn btn-success" onclick="esEnrollConfirm()">Enroll Student</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Confirmation completes the workflow</div>
+          <div class="step-desc">Once confirmed, the student is marked as enrolled and becomes eligible for the next steps in the enrollment process.</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function esEnrollConfirm(){
+  openModal(`
+    <div class="modal-head">
+      <h3>Enroll this student?</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--text-soft);line-height:1.6;">
+        This will register <b style="color:var(--navy-dark);">Juan Cruz</b> for
+        <b style="color:var(--navy-dark);">Electrical Installation NC II</b> in the current batch.
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="esEnrollStudent()">Yes, Enroll</button>
+    </div>
+  `);
+}
+
+function esEnrollStudent(){
+  closeModal();
+  showToast('Student enrolled successfully (simulated).', 'success');
+}
+
+function renderAssignStudentID(){
+  return `
+    ${taskHeader('Enrollment Management','Assign Student ID',
+      'Generate and assign a student identification number for newly enrolled learners.',
+      '2–3 minutes', ['Student has already been enrolled'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Open the enrolled student record</div>
+          <div class="step-desc">Select the student who has already been moved into the active roster.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Review the student profile</div>
+          <div class="step-desc">Confirm that the name, program, and batch are correct before generating an ID.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Preview Record</div>
+            <div class="card">
+              <div class="cell-name" style="font-size:14px;">Juan Cruz</div>
+              <div class="cell-sub">Electrical Installation NC II · July 2026 Batch</div>
+              <div class="cell-sub" style="margin-top:8px;">Student ID: <b id="es-id-display">Pending Assignment</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Assign the student ID</div>
+          <div class="step-desc">Click the action below to generate the ID and update the learner record.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-primary" onclick="esAssignStudentID()">Assign Student ID</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">The ID appears in the record</div>
+          <div class="step-desc">A confirmation toast appears and the student record now shows the generated ID.</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function esAssignStudentID(){
+  const el = document.getElementById('es-id-display');
+  if(el){ el.textContent = 'STU-2026-1042'; }
+  showToast('Student ID assigned successfully (simulated).', 'success');
+}
+
+function renderPrintEnrollmentForm(){
+  return `
+    ${taskHeader('Enrollment Management','Print Enrollment Form',
+      'Generate and print the enrollment form that summarizes the student’s approved enrollment information.',
+      '2–4 minutes', ['Student record exists and is active'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Open the student record</div>
+          <div class="step-desc">Choose the enrolled learner whose paperwork needs to be printed.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Preview the enrollment form</div>
+          <div class="step-desc">Review the form details before sending it to the printer.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Form Preview</div>
+            <div class="card">
+              <div class="cell-name" style="font-size:14px;">Juan Cruz</div>
+              <div class="cell-sub">Program: Electrical Installation NC II</div>
+              <div class="cell-sub">Batch: July 2026</div>
+              <div class="cell-sub">Student ID: STU-2026-1042</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Print the enrollment form</div>
+          <div class="step-desc">Click the button below to simulate printing the completed enrollment form.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-outline" onclick="esPrintForm()">Print Enrollment Form</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">A confirmation is shown</div>
+          <div class="step-desc">The system confirms that the form was successfully sent to the printer or document queue.</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function esPrintForm(){
+  showToast('Enrollment form sent to printer (simulated).', 'success');
+}
+
+/* =========================================================
+   CERTIFICATE MANAGEMENT
+   ========================================================= */
+function renderGenerateCertificate(){
+  return `
+    ${taskHeader('Certificate Management','Generate Certificate',
+      'Issue a certificate for a learner who has completed the required training program.',
+      '3–5 minutes', ['Learner has completed the program', 'Training records are finalized'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Select the completed learner</div>
+          <div class="step-desc">Choose the trainee whose completion record is ready for certification.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Eligible Learners</div>
+            <table class="ui-table">
+              <thead><tr><th>Learner</th><th>Program</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="cell-name">Juan Cruz</div><div class="cell-sub">Completed training</div></td>
+                  <td>Electrical Installation NC II</td>
+                  <td><span class="chip chip-approved">Completed</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="showToast('Learner selected.','info')">Select</button></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-name">Ana Reyes</div><div class="cell-sub">Completed training</div></td>
+                  <td>Bread & Pastry Production NC II</td>
+                  <td><span class="chip chip-approved">Completed</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="showToast('Learner selected.','info')">Select</button></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-name">Mark Villanueva</div><div class="cell-sub">Incomplete attendance</div></td>
+                  <td>Computer Systems Servicing NC II</td>
+                  <td><span class="chip chip-pending">Pending</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="showToast('Cannot generate certificate: learner does not meet completion requirements.','warning')">Blocked</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Verify completion details</div>
+          <div class="step-desc">Confirm the learner’s name, program, completion date, and certificate type before issuing it.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Certificate Preview</div>
+            <div class="card">
+              <div class="cell-name" style="font-size:14px;">Juan Cruz</div>
+              <div class="cell-sub">Program: Electrical Installation NC II</div>
+              <div class="cell-sub">Completion Date: July 30, 2026</div>
+              <div class="cell-sub">Certificate Type: Competency Certificate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Generate the certificate</div>
+          <div class="step-desc">Click the action below to create the certificate record and prepare it for delivery.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" onclick="showToast('Certificate generated (simulated).','success')">Generate Certificate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderReprintCertificate(){
+  return `
+    ${taskHeader('Certificate Management','Reprint Certificate',
+      'Issue a replacement copy of a previously generated certificate for an existing learner.',
+      '2–4 minutes', ['A certificate has already been generated'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Search the certificate record</div>
+          <div class="step-desc">Locate the learner whose certificate needs to be reprinted.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Certificate Search</div>
+            <input class="ui-input" placeholder="Search learner name..." value="Juan Cruz">
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Review the original certificate details</div>
+          <div class="step-desc">Confirm the certificate number, learner name, and issue date before reissuing it.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Existing Record</div>
+            <div class="card">
+              <div class="cell-name" style="font-size:14px;">Juan Cruz</div>
+              <div class="cell-sub">Certificate No: CERT-2026-018</div>
+              <div class="cell-sub">Issued On: July 30, 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Reprint the certificate</div>
+          <div class="step-desc">Generate a replacement copy and confirm that the reprint request is recorded.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-primary" onclick="showToast('Certificate reprinted (simulated).','success')">Reprint Certificate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   REPORTS MODULE
+   ========================================================= */
+function renderCompletersReport(){
+  return `
+    ${taskHeader('Reports','Generate Completers Report',
+      'Create a summary of learners who successfully completed their assigned training program.',
+      '3–5 minutes', ['Completed learners are available'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Choose the reporting period</div>
+          <div class="step-desc">Select the date range or reporting cycle for the completers list.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Report Filters</div>
+            <div style="display:grid;gap:10px;">
+              <input class="ui-input" type="date" value="2026-07-01">
+              <input class="ui-input" type="date" value="2026-07-31">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Preview the result set</div>
+          <div class="step-desc">Review the list of learners who met the completion requirements.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Preview Table</div>
+            <table class="ui-table">
+              <thead><tr><th>Learner</th><th>Program</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><div class="cell-name">Juan Cruz</div></td><td>Electrical Installation NC II</td><td><span class="chip chip-approved">Completed</span></td></tr>
+                <tr><td><div class="cell-name">Ana Reyes</div></td><td>Bread & Pastry Production NC II</td><td><span class="chip chip-approved">Completed</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Generate the report</div>
+          <div class="step-desc">Download or print the summary for internal review and officer reporting.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" onclick="showToast('Completers report generated (simulated).','success')">Generate Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEnrollmentReport(){
+  return `
+    ${taskHeader('Reports','Generate Enrollment Report',
+      'Produce an enrollment summary showing approved learners and their assigned programs.',
+      '3–5 minutes', ['Enrollment records are available'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Select the academic period</div>
+          <div class="step-desc">Choose the batch or date range to include in the enrollment summary.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Report Filters</div>
+            <input class="ui-input" type="month" value="2026-07">
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Preview the enrolled learners</div>
+          <div class="step-desc">Review the list of learners who have been successfully enrolled.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Preview Table</div>
+            <table class="ui-table">
+              <thead><tr><th>Learner</th><th>Program</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><div class="cell-name">Juan Cruz</div></td><td>Electrical Installation NC II</td><td><span class="chip chip-approved">Enrolled</span></td></tr>
+                <tr><td><div class="cell-name">Ana Reyes</div></td><td>Bread & Pastry Production NC II</td><td><span class="chip chip-approved">Enrolled</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Generate the enrollment report</div>
+          <div class="step-desc">Save or print the final summary for administration and planning purposes.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" onclick="showToast('Enrollment report generated (simulated).','success')">Generate Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEmploymentReport(){
+  return `
+    ${taskHeader('Reports','Generate Employment Report',
+      'Summarize learners who have secured employment after completing their training program.',
+      '3–5 minutes', ['Employment outcome data is available'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Select the reporting period</div>
+          <div class="step-desc">Choose the period to include in the employment outcome summary.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Report Filters</div>
+            <input class="ui-input" type="month" value="2026-07">
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Review employment outcomes</div>
+          <div class="step-desc">Inspect the list of learners who are now employed and their placement status.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Preview Summary</div>
+            <table class="ui-table">
+              <thead><tr><th>Learner</th><th>Program</th><th>Employment Status</th></tr></thead>
+              <tbody>
+                <tr><td><div class="cell-name">Juan Cruz</div></td><td>Electrical Installation NC II</td><td><span class="chip chip-approved">Employed</span></td></tr>
+                <tr><td><div class="cell-name">Ana Reyes</div></td><td>Bread & Pastry Production NC II</td><td><span class="chip chip-review">Pending Placement</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Generate the employment report</div>
+          <div class="step-desc">Produce the report for partner agencies, administrators, and program monitoring.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" onclick="showToast('Employment report generated (simulated).','success')">Generate Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTerminalReport(){
+  return `
+    ${taskHeader('Reports','Generate Terminal Report',
+      'Create a terminal summary of program outcomes, learner progress, and overall completion status.',
+      '3–5 minutes', ['Program records are available'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Select the program or batch</div>
+          <div class="step-desc">Choose the training program or batch to include in the terminal report.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Report Filters</div>
+            <select class="ui-select" style="width:100%;">
+              <option>Electrical Installation NC II</option>
+              <option>Bread & Pastry Production NC II</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Review program outcomes</div>
+          <div class="step-desc">Inspect completion counts, employment status, and any pending follow-ups.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Preview Summary</div>
+            <div class="card">
+              <div class="cell-sub">Completed Learners: 20</div>
+              <div class="cell-sub">Employed: 14</div>
+              <div class="cell-sub">Pending Follow-up: 6</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Generate the terminal report</div>
+          <div class="step-desc">Finalize the summary report for administration and end-of-program review.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" onclick="showToast('Terminal report generated (simulated).','success')">Generate Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   TRAINING MANAGEMENT
+   ========================================================= */
+function renderCreateTrainingProgram(){
+  return `
+    ${taskHeader('Training Management','Create Training Program',
+      'Set up a new training offering by defining the program, duration, and required resources.',
+      '4–6 minutes', ['Program details are prepared', 'A training coordinator is assigned'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Open the program creation form</div>
+          <div class="step-desc">Start from <code>Training Management → Create Training Program</code> to begin a new training setup.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Enter core program information</div>
+          <div class="step-desc">Fill in the program name, description, required hours, and competency level.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Program Form Preview</div>
+            <div class="card">
+              <div style="display:grid;gap:10px;">
+                <input class="ui-input" placeholder="Program Name" value="Culinary Arts NC II">
+                <input class="ui-input" placeholder="Duration" value="120 hours">
+                <select class="ui-select"><option>Competency-Based</option></select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Save and publish the training program</div>
+          <div class="step-desc">Once submitted, the program becomes available for scheduling and enrollment.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" onclick="showToast('Training program created (simulated).','success')">Save Program</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAssignTrainer(){
+  return `
+    ${taskHeader('Training Management','Assign Trainer',
+      'Match a qualified trainer to the training program and confirm their availability.',
+      '3–4 minutes', ['A program has already been created'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Select the training program</div>
+          <div class="step-desc">Choose the scheduled program that needs an instructor assigned.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Choose an available trainer</div>
+          <div class="step-desc">Review trainer qualifications, specialization, and current load before assigning them.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Trainer Selection Preview</div>
+            <table class="ui-table">
+              <thead><tr><th>Trainer</th><th>Specialization</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="cell-name">Mr. Romeo Delos Reyes</div><div class="cell-sub">Certified trainer</div></td>
+                  <td>Culinary</td>
+                  <td><span class="chip chip-review">Available</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="showToast('Trainer selected.','info')">Assign</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Confirm the assignment</div>
+          <div class="step-desc">Once confirmed, the trainer is linked to the program and appears in the training roster.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-primary" onclick="showToast('Trainer assigned successfully (simulated).','success')">Confirm Assignment</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderManageTrainingSchedule(){
+  return `
+    ${taskHeader('Training Management','Manage Training Schedule',
+      'Build and update the class calendar by setting dates, venue, and session times for the training program.',
+      '3–5 minutes', ['Program and trainer are already assigned'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Choose the training program</div>
+          <div class="step-desc">Select the program that needs its class schedule defined.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Set the schedule details</div>
+          <div class="step-desc">Specify the start date, end date, classroom, and daily schedule.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Schedule Preview</div>
+            <div class="card">
+              <div style="display:grid;gap:12px;">
+                <div>
+                  <label style="display:block;font-size:11.5px;font-weight:700;color:var(--text-soft);margin-bottom:6px;">Start Date</label>
+                  <input class="ui-input" type="date" value="2026-08-05">
+                </div>
+                <div>
+                  <label style="display:block;font-size:11.5px;font-weight:700;color:var(--text-soft);margin-bottom:6px;">End Date</label>
+                  <input class="ui-input" type="date" value="2026-08-30">
+                </div>
+                <div>
+                  <label style="display:block;font-size:11.5px;font-weight:700;color:var(--text-soft);margin-bottom:6px;">Start Time</label>
+                  <input class="ui-input" type="time" value="08:00">
+                </div>
+                <div>
+                  <label style="display:block;font-size:11.5px;font-weight:700;color:var(--text-soft);margin-bottom:6px;">End Time</label>
+                  <input class="ui-input" type="time" value="17:00">
+                </div>
+                <div>
+                  <label style="display:block;font-size:11.5px;font-weight:700;color:var(--text-soft);margin-bottom:6px;">Venue</label>
+                  <input class="ui-input" value="Room 204">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Publish the schedule</div>
+          <div class="step-desc">Once saved, the schedule becomes available for trainees and trainers to view.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" onclick="showToast('Training schedule updated (simulated).','success')">Save Schedule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   USER MANAGEMENT
+   ========================================================= */
+function renderAddUser(){
+  return `
+    ${taskHeader('User Management','Add User',
+      'Create a new staff account with the correct role, access level, and account status.',
+      '3–5 minutes', ['Administrator account is active', 'User role and department are known'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Gather the new user's details</div>
+          <div class="step-desc">Prepare the full name, email, role, and assigned department before creating the account.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Account Form Preview</div>
+            <div class="card" style="display:grid;gap:12px;">
+              <input class="ui-input" placeholder="Full Name" value="Rhea Dela Cruz">
+              <input class="ui-input" placeholder="Email" value="rhea.delacruz@mcctest.edu">
+              <select class="ui-select">
+                <option>Administrator</option>
+                <option>Registrar</option>
+                <option>Trainer</option>
+                <option>Staff</option>
+              </select>
+              <select class="ui-select">
+                <option>Admissions Office</option>
+                <option>Training Office</option>
+                <option>Finance Office</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Set default access permissions</div>
+          <div class="step-desc">Assign the user to the appropriate module access group so they can work in the correct area of the system.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Permission Preview</div>
+            <div class="card">
+              <div class="cell-sub">Admission Management: Read/Write</div>
+              <div class="cell-sub">Enrollment Management: Read/Write</div>
+              <div class="cell-sub">Reports: Read Only</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Create the account</div>
+          <div class="step-desc">Save the new account and notify the user with a temporary password or activation link.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-success" onclick="showToast('New user account created (simulated).','success')">Create User</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEditUser(){
+  return `
+    ${taskHeader('User Management','Edit User',
+      'Update a staff member\'s role, contact details, or access level without changing their core account identity.',
+      '2–4 minutes', ['Existing user account is available'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Select the account to update</div>
+          <div class="step-desc">Open the staff list and choose the person whose information needs to be changed.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Current Accounts</div>
+            <table class="ui-table">
+              <thead><tr><th>User</th><th>Role</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="cell-name">Rhea Dela Cruz</div><div class="cell-sub">rhea.delacruz@mcctest.edu</div></td>
+                  <td>Administrator</td>
+                  <td><span class="chip chip-approved">Active</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="showToast('User profile selected for editing.','info')">Select</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Modify the account fields</div>
+          <div class="step-desc">Change the role, department, or email address as needed and review the updated details before saving.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Edit Preview</div>
+            <div class="card" style="display:grid;gap:12px;">
+              <input class="ui-input" placeholder="Full Name" value="Rhea Dela Cruz">
+              <input class="ui-input" placeholder="Email" value="rhea.delacruz@mcctest.edu">
+              <select class="ui-select">
+                <option>Administrator</option>
+                <option>Registrar</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Save the changes</div>
+          <div class="step-desc">Confirm the update so the new role and details are reflected for the next login.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-primary" onclick="showToast('User account updated (simulated).','success')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDisableUser(){
+  return `
+    ${taskHeader('User Management','Disable User',
+      'Temporarily deactivate a staff account when the user is leaving, suspended, or no longer needs access.',
+      '2–3 minutes', ['An active account exists'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Choose the account to disable</div>
+          <div class="step-desc">Select the active user whose access should be temporarily removed from the system.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Active Accounts</div>
+            <table class="ui-table">
+              <thead><tr><th>User</th><th>Role</th><th></th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="cell-name">Marlon Santos</div><div class="cell-sub">marlon.santos@mcctest.edu</div></td>
+                  <td>Staff</td>
+                  <td style="text-align:right;"><button class="btn btn-danger btn-sm" onclick="showToast('User account disabled (simulated).','warning')">Disable</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Confirm the action</div>
+          <div class="step-desc">The system records the deactivation and prevents future sign-ins until the account is re-enabled.</div>
+          <div class="info-note">
+            <div><b>Note</b>Disabling an account preserves the user record so it can be reactivated later without creating a new profile.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderResetPassword(){
+  return `
+    ${taskHeader('User Management','Reset Password',
+      'Issue a temporary password or force a password reset for a user who is locked out or forgot their credentials.',
+      '2–3 minutes', ['A user account already exists'])}
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Select the affected user</div>
+          <div class="step-desc">Find the account that needs a password reset and open the profile.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">User Search</div>
+            <input class="ui-input" placeholder="Search user name..." value="Rhea Dela Cruz">
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Generate a temporary password</div>
+          <div class="step-desc">Create a secure temporary password and require the user to change it on next login.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Reset Preview</div>
+            <div class="card" style="display:grid;gap:12px;">
+              <input class="ui-input" placeholder="Temporary Password" value="Temp@2026!">
+              <div class="cell-sub">Next login requires password change</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Confirm the reset</div>
+          <div class="step-desc">Save the reset and notify the user that their temporary credentials are ready.</div>
+          <div class="mockup-box">
+            <div class="mockup-label">Interactive Preview</div>
+            <button class="btn btn-warning" onclick="showToast('Password reset initiated (simulated).','success')">Reset Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderRoute('dashboard','dashboard');
+});
+</script>
 </body>
 </html>

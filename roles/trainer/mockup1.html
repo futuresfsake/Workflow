@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillTrack - Trainer Workspace Hub & Interactive Mockup</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --primary-blue: #1e3a8a;
+            --accent-blue: #3b82f6;
+            --bg-light: #f8fafc;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --color-trainer: #f59e0b;
+            --color-trainer-dark: #d97706;
+            
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+            --info-bg: #f0fdf4;
+            --info-border: #d1fae5;
+            --info-text: #15803d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); display: flex; min-height: 100vh; overflow: hidden; }
+
+        /* Left Column: Sidebar */
+        .sidebar { width: 300px; background-color: var(--navy-dark); color: white; padding: 25px 20px; display: flex; flex-direction: column; gap: 15px; border-right: 1px solid var(--border-muted); height: 100vh; overflow-y: auto; flex-shrink: 0; }
+        .sidebar h2 { font-size: 18px; font-weight: 700; border-bottom: 1px solid #334155; padding-bottom: 12px; }
+        .sidebar p { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .menu-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 6px; padding-left: 5px; }
+        .task-list { list-style: none; display: flex; flex-direction: column; gap: 4px; margin-bottom: 15px; }
+        .task-link { padding: 8px 12px; font-size: 13px; border-radius: 6px; color: #94a3b8; text-decoration: none; cursor: pointer; display: block; transition: all 0.2s; }
+        .task-link:hover { background-color: rgba(255,255,255,0.04); color: #f1f5f9; }
+        .task-link.active { background-color: var(--color-trainer); color: var(--navy-dark); font-weight: 600; }
+
+        /* Center Column: Live Workspace Mockup */
+        .workspace { flex: 1; padding: 30px 40px; height: 100vh; overflow-y: auto; background: #ffffff; border-right: 1px solid var(--border-muted); }
+        
+        /* Right Column: Walkthrough Step Panels */
+        .guide-panel { width: 360px; background-color: #fafafa; padding: 30px 25px; height: 100vh; overflow-y: auto; flex-shrink: 0; }
+        .guide-title { font-size: 16px; font-weight: 700; color: var(--navy-dark); margin-bottom: 20px; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; }
+
+        /* Step Layout Paradigm */
+        .step-block { display: grid; grid-template-columns: 30px 1fr; gap: 10px; margin-bottom: 20px; position: relative; }
+        .step-block::after { content: ''; position: absolute; left: 14px; top: 24px; bottom: -24px; width: 2px; background-color: var(--border-muted); }
+        .step-block:last-child::after { display: none; }
+        .step-number { font-size: 11px; font-weight: 700; color: #64748b; background: #e2e8f0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; z-index: 2; margin-top: 2px; }
+        .step-name { font-size: 14px; font-weight: 600; color: var(--navy-dark); }
+        .step-description { font-size: 12px; color: #475569; line-height: 1.5; }
+
+        /* Interactive Element Classes */
+        .mockup-container { display: none; }
+        .mockup-container.active { display: block; animation: easeIn 0.25s forwards; }
+        @keyframes easeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .feature-meta { font-size: 11px; font-weight: 700; color: var(--color-trainer-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .task-title { font-size: 22px; color: var(--navy-dark); font-weight: 700; margin-bottom: 20px; }
+        
+        /* Grid Module & Selection Layout Block Links */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
+        .module-card { border: 1px solid var(--border-muted); border-radius: 8px; padding: 20px; cursor: pointer; transition: all 0.2s; background: var(--bg-light); }
+        .module-card:hover { border-color: var(--accent-blue); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .module-card h3 { font-size: 15px; color: var(--navy-dark); margin-bottom: 8px; }
+        .module-card p { font-size: 12px; color: #64748b; line-height: 1.4; }
+
+        /* Custom Component Choice Elements */
+        .class-card { border: 2px solid var(--border-muted); border-radius: 8px; padding: 16px; cursor: pointer; background: white; transition: all 0.2s ease; display: flex; flex-direction: column; gap: 8px; }
+        .class-card:hover { border-color: #cbd5e1; }
+        .class-card.selected { border-color: var(--accent-blue); background-color: #f0f7ff; }
+        
+        .badge { display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 12px; text-transform: uppercase; }
+        .badge-success { background: #dcfce7; color: #15803d; }
+        .badge-danger { background: #fee2e2; color: #b91c1c; }
+        
+        .form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--border-muted); border-radius: 6px; font-size: 14px; margin-top: 5px; }
+        .btn { padding: 10px 16px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; border: none; transition: background 0.2s; }
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
+        
+        .ui-callout { padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 12px; border-left: 4px solid transparent; }
+        .ui-callout-warning { background: var(--warning-bg); border: 1px solid var(--warning-border); border-left-color: var(--color-trainer); color: var(--warning-text); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <h2>SkillTrack Portal</h2>
+            <p>Operational Logs Index</p>
+        </div>
+
+        <div class="menu-group">
+            <ul class="task-list">
+                <li id="link-dashboard" class="task-link active" onclick="navigateHub('dashboard-view')">🏠 Trainer Dashboard Hub</li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">1. Class Management</div>
+            <ul class="task-list">
+                <li id="link-t1" class="task-link" onclick="navigateHub('t1-mock')">Class & Student List</li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">2. Attendance Management</div>
+            <ul class="task-list">
+                <li id="link-t3" class="task-link" onclick="navigateHub('t3-mock')">Attendance Module</li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">3. Progress & Grade Encoding</div>
+            <ul class="task-list">
+                <li id="link-t5" class="task-link" onclick="navigateHub('t5-mock')">Encode Competency Marks</li>
+                
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">4. Inventory & Borrowing</div>
+            <ul class="task-list">
+                <li id="link-t8" class="task-link" onclick="navigateHub('t8-mock')">Laboratory Assets & Logs</li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-group-title">5. Approvals & Administrative</div>
+            <ul class="task-list">
+                <li id="link-t10" class="task-link" onclick="navigateHub('t10-mock')">Course Withdrawals</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="workspace">
+        
+        <div id="dashboard-view" class="mockup-container active">
+            <div class="feature-meta">Authorized Workspace Console</div>
+            <div class="task-title">Trainer Dashboard Overview</div>
+            <p style="font-size: 14px; color: #475569;">Select a control component module box below or use the operational steps index to trigger deep-dive configurations.</p>
+            
+            <div class="dashboard-grid">
+                <div class="module-card" onclick="navigateHub('t1-mock')">
+                    <h3>1. Class Management</h3>
+                    <p>Review class lists, cross-check minimum tracking targets, and allocate commencement dates.</p>
+                </div>
+                <div class="module-card" onclick="navigateHub('t3-mock')">
+                    <h3>2. Attendance Management</h3>
+                    <p>Track student presence logs, modify attendance records, and apply automated system cutoffs.</p>
+                </div>
+                <div class="module-card" onclick="navigateHub('t5-mock')">
+                    <h3>3. Progress & Grade Encoding</h3>
+                    <p>Evaluate laboratory milestones and manage performance matrix marks securely.</p>
+                </div>
+                <div class="module-card" onclick="navigateHub('t8-mock')">
+                    <h3>4. Inventory & Borrowing</h3>
+                    <p>Process pending laboratory equipment requests and track return records logs.</p>
+                </div>
+                <div class="module-card" onclick="navigateHub('t10-mock')">
+                    <h3>5. Approvals & Admin</h3>
+                    <p>Audit uniform returns, asset clearance rules, and execute official student drops.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="t1-mock" class="mockup-container">
+            
+            <div class="feature-meta">Module Component Panel: Class Management</div>
+            <div class="task-title">Assigned Qualifications Workspace</div>
+
+            <p style="font-size: 13px; font-weight: 600; color: var(--navy-dark); margin-bottom: 12px; text-transform: uppercase;">Select Target Training Batch Allocation</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                
+                <div id="card-css-insufficient" class="class-card" onclick="executeCardVerification('css-insufficient', 12, false)">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 15px; font-weight: 700; color: var(--navy-dark);">CSS-NC2-2026B</span>
+                        <span class="badge badge-danger">No (Failed Quorum)</span>
+                    </div>
+                    <div style="font-size: 13px; color: #475569;">
+                        <strong>Registered Enrollees:</strong> 12 Students
+                    </div>
+                </div>
+
+                <div id="card-css-valid" class="class-card" onclick="executeCardVerification('css-valid', 18, true)">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 15px; font-weight: 700; color: var(--navy-dark);">CSS-NC2-2026A</span>
+                        <span class="badge badge-success">Passed Minimum</span>
+                    </div>
+                    <div style="font-size: 13px; color: #475569;">
+                        <strong>Registered Enrollees:</strong> 18 Students
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="cardActionContextDeck" style="display: none; border-top: 1px solid var(--border-muted); padding-top: 20px;">
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 13px; font-weight: 600; color: var(--navy-dark);" for="commencementDate">Configure Calendar Commencement Date</label>
+                    <input type="date" id="commencementDate" class="form-control">
+                    
+                    <div id="t1WarningCallout" class="ui-callout ui-callout-warning" style="display: none;">
+                        <strong style="text-transform: uppercase; font-size: 11px; display: block; margin-bottom: 4px;">Validation Constraint Block</strong>
+                        If the total number of enrollees sits below the absolute minimum requirement of 15 students, the date picker system configuration remains locked and unclickable.
+                    </div>
+                </div>
+
+                <button id="lockScheduleBtn" class="btn btn-primary" onclick="alert('Schedule committed securely inside internal engine layer!')">Confirm & Lock Batch Schedule</button>
+            </div>
+        </div>
+
+        <div id="t3-mock" class="mockup-container">
+    <div class="feature-meta">Module Component Panel: Attendance</div>
+    <div class="task-title">Attendance Tracking Logs Console</div>
+    
+    <!-- Check & Encode Daily Attendance Section -->
+    <div class="interactive-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+        <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">📅 Check & Encode Daily Attendance</div>
+        
+        <!-- Step 2: Select Target Training Batch -->
+        <div class="form-group" style="margin-bottom: 16px; max-width: 350px;">
+            <label style="font-size: 13px; font-weight: 600; color: #475569;">Select Target Training Batch</label>
+            <select id="attendanceBatchSelect" onchange="updateAttendanceTable()" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white;">
+                <option value="css">CSS-NC2-2026A (19 Students)</option>
+                <option value="wld">WLD-NC2-2026A (12 Students)</option>
+                <option value="hks">HKS-NC2-2026B (25 Students)</option>
+            </select>
+        </div>
+
+        <!-- Step 3: Configure Session Tracking Date -->
+        <div class="form-group" style="margin-bottom: 20px; max-width: 200px;">
+            <label style="font-size: 13px; font-weight: 600; color: #475569;">Session Tracking Date</label>
+            <input type="date" id="attendanceDate" value="2026-07-08" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px;">
+        </div>
+
+        <!-- Step 4: Modify Trainee Operational Attendance Status Indicators -->
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px;">
+            <thead>
+                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Student Name</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Attendance Status</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceTableBody">
+                <!-- Rows injected by JS -->
+            </tbody>
+        </table>
+
+        <!-- Step 5: Commit Daily Log Session Metrics -->
+        <button class="btn btn-success" onclick="saveAttendance()" style="padding: 10px 24px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+            💾 Save Current Sheet Daily Record
+        </button>
+        <div id="attendanceSaveAlert" style="margin-top: 12px; display: none; padding: 10px 16px; border-radius: 6px; background: #f0fdf4; border: 1px solid #d1fae5; color: #065f46; font-size: 14px;"></div>
+    </div>
+
+    <!-- Attendance Audit Sheet Section -->
+    <div class="interactive-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px;">
+        <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">📊 Attendance Audit Sheet</div>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Cumulative attendance summary for the selected batch. Tracks total presents, absences, lates, and compliance percentage.</p>
+        
+        <!-- Batch selector for audit sheet -->
+        <div class="form-group" style="margin-bottom: 20px; max-width: 350px;">
+            <label style="font-size: 13px; font-weight: 600; color: #475569;">Select Class to View Audit Data</label>
+            <select id="auditBatchSelect" onchange="updateAuditSheet()" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white;">
+                <option value="css">CSS-NC2-2026A (19 Students)</option>
+                <option value="wld">WLD-NC2-2026A (12 Students)</option>
+                <option value="hks">HKS-NC2-2026B (25 Students)</option>
+            </select>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <thead>
+                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Student Name</th>
+                    <th style="text-align: center; padding: 12px; font-weight: 600; color: #475569;">Total Sessions</th>
+                    <th style="text-align: center; padding: 12px; font-weight: 600; color: #475569; background: #d1fae5;">Present</th>
+                    <th style="text-align: center; padding: 12px; font-weight: 600; color: #475569; background: #fee2e2;">Absent</th>
+                    <th style="text-align: center; padding: 12px; font-weight: 600; color: #475569; background: #fef3c7;">Late</th>
+                    <th style="text-align: center; padding: 12px; font-weight: 600; color: #475569;">Compliance %</th>
+                    <th style="text-align: center; padding: 12px; font-weight: 600; color: #475569;">Status</th>
+                </tr>
+            </thead>
+            <tbody id="auditTableBody">
+                <!-- Rows injected by JS -->
+            </tbody>
+        </table>
+
+        <!-- Automated Drop Enforcement Warning -->
+        <div style="margin-top: 20px; padding: 16px; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 6px; border-left: 4px solid #ef4444;">
+            <strong style="color: #991b1b; font-size: 14px;">⚠️ Automated Drop Enforcement Warning</strong>
+            <p style="font-size: 13px; color: #7f1d1d; margin-top: 4px;">The underlying system engine will automatically apply a <strong>[DROPPED EXCEPTION]</strong> tag for trainees who fall below the 80% attendance compliance threshold.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Attendance data store - tracks daily statuses
+    const attendanceData = {
+        css: {
+            students: ['Marcus Sterling', 'Elena Rostova', 'Devon Lane', 'Sarah Jenkins', 'Michael Chen'],
+            statuses: {},
+            history: {} // stores daily records
+        },
+        wld: {
+            students: ['Anna Kowalski', 'James O\'Brien', 'Liam Patel', 'Sophia Rodriguez'],
+            statuses: {},
+            history: {}
+        },
+        hks: {
+            students: ['Yuki Tanaka', 'Maria Santos', 'David Kim', 'Aisha Mohammed', 'Carlos Garcia', 'Emma Wilson'],
+            statuses: {},
+            history: {}
+        }
+    };
+
+    // Generate some historical data for the audit sheet
+    function generateHistoricalData() {
+        const statuses = ['Present', 'Absent', 'Late'];
+        const dates = ['2026-06-01', '2026-06-05', '2026-06-08', '2026-06-12', '2026-06-15', '2026-06-19', '2026-06-22', '2026-06-26', '2026-06-29', '2026-07-03', '2026-07-06'];
+        
+        for (const batch in attendanceData) {
+            const students = attendanceData[batch].students;
+            attendanceData[batch].history = {};
+            
+            students.forEach(student => {
+                attendanceData[batch].history[student] = [];
+                // Generate random attendance for past dates
+                dates.forEach(date => {
+                    // Bias toward Present (60%), Absent (25%), Late (15%)
+                    const rand = Math.random();
+                    let status;
+                    if (rand < 0.60) status = 'Present';
+                    else if (rand < 0.85) status = 'Absent';
+                    else status = 'Late';
+                    attendanceData[batch].history[student].push({ date, status });
+                });
+            });
+        }
+    }
+    generateHistoricalData();
+
+    // Initialize statuses with [NULL] for all students
+    function initializeStatuses() {
+        for (const batch in attendanceData) {
+            attendanceData[batch].students.forEach(student => {
+                attendanceData[batch].statuses[student] = '[NULL]';
+            });
+        }
+    }
+    initializeStatuses();
+
+    // Calculate student attendance metrics
+    function calculateMetrics(batch, student) {
+        const history = attendanceData[batch].history[student] || [];
+        let present = 0, absent = 0, late = 0;
+        
+        history.forEach(record => {
+            if (record.status === 'Present') present++;
+            else if (record.status === 'Absent') absent++;
+            else if (record.status === 'Late') late++;
+        });
+        
+        const total = present + absent + late;
+        const compliance = total > 0 ? Math.round((present / total) * 100) : 0;
+        const isDropped = compliance < 80 && total > 0;
+        
+        return { present, absent, late, total, compliance, isDropped };
+    }
+
+    // Render attendance table (daily encoding)
+    function updateAttendanceTable() {
+        const batch = document.getElementById('attendanceBatchSelect').value;
+        const students = attendanceData[batch].students;
+        const statuses = attendanceData[batch].statuses;
+        const tbody = document.getElementById('attendanceTableBody');
+        tbody.innerHTML = '';
+
+        students.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 500;">${student}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                    <select onchange="updateStudentStatus('${batch}', '${student}', this.value)" style="padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white; min-width: 120px;">
+                        <option value="[NULL]" ${statuses[student] === '[NULL]' ? 'selected' : ''}>[NULL]</option>
+                        <option value="Present" ${statuses[student] === 'Present' ? 'selected' : ''}>Present</option>
+                        <option value="Absent" ${statuses[student] === 'Absent' ? 'selected' : ''}>Absent</option>
+                        <option value="Late" ${statuses[student] === 'Late' ? 'selected' : ''}>Late</option>
+                    </select>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Update student status for daily encoding
+    function updateStudentStatus(batch, student, value) {
+        attendanceData[batch].statuses[student] = value;
+    }
+
+    // Save attendance (adds to history)
+    function saveAttendance() {
+        const alert = document.getElementById('attendanceSaveAlert');
+        const batch = document.getElementById('attendanceBatchSelect').value;
+        const date = document.getElementById('attendanceDate').value;
+        const statuses = attendanceData[batch].statuses;
+        
+        // Save to history
+        const students = attendanceData[batch].students;
+        students.forEach(student => {
+            const status = statuses[student];
+            if (status !== '[NULL]') {
+                if (!attendanceData[batch].history[student]) {
+                    attendanceData[batch].history[student] = [];
+                }
+                // Check if entry for this date already exists
+                const existing = attendanceData[batch].history[student].findIndex(r => r.date === date);
+                if (existing !== -1) {
+                    attendanceData[batch].history[student][existing].status = status;
+                } else {
+                    attendanceData[batch].history[student].push({ date, status });
+                }
+            }
+        });
+        
+        // Count present/absent/late for summary
+        let present = 0, absent = 0, late = 0, nullCount = 0;
+        for (const student in statuses) {
+            const status = statuses[student];
+            if (status === 'Present') present++;
+            else if (status === 'Absent') absent++;
+            else if (status === 'Late') late++;
+            else if (status === '[NULL]') nullCount++;
+        }
+
+        alert.style.display = 'block';
+        alert.innerHTML = `
+            ✅ Daily records saved to local relational instance layer.<br>
+            <span style="font-size: 13px; color: #475569;">
+                Batch: ${batch.toUpperCase()} | Date: ${date} | 
+                Present: ${present} | Absent: ${absent} | Late: ${late} | [NULL]: ${nullCount}
+            </span>
+        `;
+        
+        // Update audit sheet if same batch
+        const auditBatch = document.getElementById('auditBatchSelect').value;
+        if (auditBatch === batch) {
+            updateAuditSheet();
+        }
+        
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    // Render audit sheet
+    function updateAuditSheet() {
+        const batch = document.getElementById('auditBatchSelect').value;
+        const students = attendanceData[batch].students;
+        const tbody = document.getElementById('auditTableBody');
+        tbody.innerHTML = '';
+
+        students.forEach(student => {
+            const metrics = calculateMetrics(batch, student);
+            const isDropped = metrics.isDropped;
+            const statusText = isDropped ? '[DROPPED EXCEPTION]' : 'Good Standing';
+            
+            const row = document.createElement('tr');
+            row.style.background = isDropped ? '#fff5f5' : 'transparent';
+            row.innerHTML = `
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 500;">${student}</td>
+                <td style="text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0;">${metrics.total}</td>
+                <td style="text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0; background: #f0fdf4; font-weight: 600; color: #065f46;">${metrics.present}</td>
+                <td style="text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0; background: #fef2f2; font-weight: 600; color: #991b1b;">${metrics.absent}</td>
+                <td style="text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0; background: #fffbeb; font-weight: 600; color: #92400e;">${metrics.late}</td>
+                <td style="text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                    <strong style="color: ${isDropped ? '#ef4444' : '#10b981'};">${metrics.compliance}%</strong>
+                </td>
+                <td style="text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                    <span class="badge ${isDropped ? 'badge-danger' : 'badge-success'}" style="display: inline-block; padding: 4px 14px; font-size: 11px; font-weight: 700; border-radius: 20px; text-transform: uppercase; ${isDropped ? 'background: #fee2e2; color: #991b1b;' : 'background: #d1fae5; color: #065f46;'}">
+                        ${statusText}
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateAttendanceTable();
+        updateAuditSheet();
+        // Set default date
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('attendanceDate').value = today;
+    });
+</script>
+
+<style>
+    .badge-danger {
+        background: #fee2e2 !important;
+        color: #991b1b !important;
+    }
+    .badge-success {
+        background: #d1fae5 !important;
+        color: #065f46 !important;
+    }
+    .attendance-tab {
+        animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+        <div id="t5-mock" class="mockup-container">
+    <div class="feature-meta">Module Component Panel: Progress</div>
+    <div class="task-title">Encode Competency Marks Workspace</div>
+    
+    <!-- Tab Navigation -->
+    <div style="display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 0;">
+        <button class="progress-tab-btn active" onclick="switchProgressTab('tabGradeEncoding', this)" style="padding: 10px 24px; background: transparent; border: none; border-bottom: 3px solid #f59e0b; font-weight: 600; color: #0f172a; cursor: pointer; font-size: 14px;">
+            📋 Encode Competency Marks
+        </button>
+        <button class="progress-tab-btn" onclick="switchProgressTab('tabProgressChart', this)" style="padding: 10px 24px; background: transparent; border: none; border-bottom: 3px solid transparent; font-weight: 500; color: #64748b; cursor: pointer; font-size: 14px;">
+            📊 Progress Chart of Students
+        </button>
+    </div>
+
+    <!-- TAB 1: Encode Competency Marks -->
+    <div id="tabGradeEncoding" class="progress-tab">
+        <div class="interactive-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; margin-bottom: 20px;">
+            <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">📋 Binary Competency Assessment Grid</div>
+            <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Evaluate laboratory performance and map specific unit dropdown metrics to either Competent (C) or Not Yet Competent (NYC) status markers.</p>
+            
+            <!-- Batch Selector -->
+            <div class="form-group" style="margin-bottom: 16px; max-width: 350px;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569;">Select Training Batch</label>
+                <select id="gradeBatchSelect" onchange="updateGradeTable()" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white;">
+                    <option value="css">CSS-NC2-2026A (19 Students)</option>
+                    <option value="wld">WLD-NC2-2026A (12 Students)</option>
+                    <option value="hks">HKS-NC2-2026B (25 Students)</option>
+                </select>
+            </div>
+
+            <!-- Competency Grid -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                        <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Student Name</th>
+                        <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Unit 1: Safety Protocols</th>
+                        <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Unit 2: Equipment Operation</th>
+                        <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Unit 3: Troubleshooting</th>
+                        <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Unit 4: Documentation</th>
+                        <th style="text-align: center; padding: 12px; font-weight: 600; color: #475569;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="gradeTableBody">
+                    <!-- Rows injected by JS -->
+                </tbody>
+            </table>
+
+            <!-- Compile Batch Competency List -->
+            <div style="margin-top: 20px; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+                <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 12px;">📋 Competent Students List</div>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">Click the <strong>Add Button</strong> next to competent students to compile them here. Copy the list for external use.</p>
+                <div id="competentContainer" class="textarea-block" style="background: #f1f5f9; border: 1px dashed #94a3b8; padding: 14px; border-radius: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; min-height: 80px; color: #334155;">
+                    --- No competent students added yet ---
+                </div>
+                <button class="btn btn-primary" onclick="copyCompetentList()" style="margin-top: 10px; padding: 8px 20px; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    📋 Copy List to Clipboard
+                </button>
+                <div id="copyAlert" style="margin-top: 8px; display: none; padding: 8px 16px; border-radius: 6px; background: #f0fdf4; border: 1px solid #d1fae5; color: #065f46; font-size: 13px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: Progress Chart of Students -->
+    <div id="tabProgressChart" class="progress-tab" style="display: none;">
+        <div class="interactive-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px;">
+            <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">📊 Real-Time Progress Aggregation Views</div>
+            <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Analyze visual status bars mapping overall module progress metrics across the assigned qualification's core competency criteria requirements.</p>
+            
+            <!-- Batch Selector for Progress -->
+            <div class="form-group" style="margin-bottom: 20px; max-width: 350px;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569;">Select Training Batch</label>
+                <select id="progressBatchSelect" onchange="updateProgressChart()" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white;">
+                    <option value="css">CSS-NC2-2026A (19 Students)</option>
+                    <option value="wld">WLD-NC2-2026A (12 Students)</option>
+                    <option value="hks">HKS-NC2-2026B (25 Students)</option>
+                </select>
+            </div>
+
+            <!-- Progress Chart Display -->
+            <div id="progressChartContainer">
+                <!-- Progress items injected by JS -->
+            </div>
+
+            <!-- NC2 Readiness Rule -->
+            <div style="margin-top: 20px; padding: 16px; background: #f0fdf4; border: 1px solid #d1fae5; border-radius: 6px; border-left: 4px solid #10b981;">
+                <strong style="color: #065f46; font-size: 14px;">✅ NC2 Readiness Rule</strong>
+                <p style="font-size: 13px; color: #065f46; margin-top: 4px;">Trainees who hit <strong>100%</strong> completion parameters across all structural core competency nodes are flagged automatically for final institutional certification routines.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Grade data
+    const gradeData = {
+        css: {
+            students: [
+                { name: 'Marcus Sterling', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Elena Rostova', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Devon Lane', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Sarah Jenkins', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Michael Chen', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } }
+            ]
+        },
+        wld: {
+            students: [
+                { name: 'Anna Kowalski', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'James O\'Brien', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Liam Patel', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Sophia Rodriguez', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } }
+            ]
+        },
+        hks: {
+            students: [
+                { name: 'Yuki Tanaka', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Maria Santos', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'David Kim', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Aisha Mohammed', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Carlos Garcia', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } },
+                { name: 'Emma Wilson', units: { safety: 'NYC', operation: 'NYC', troubleshooting: 'NYC', documentation: 'NYC' } }
+            ]
+        }
+    };
+
+    let competentStudents = [];
+
+    // Check if student is competent (all units = 'C')
+    function isStudentCompetent(units) {
+        return units.safety === 'C' && units.operation === 'C' && 
+               units.troubleshooting === 'C' && units.documentation === 'C';
+    }
+
+    // Update grade table
+    function updateGradeTable() {
+        const batch = document.getElementById('gradeBatchSelect').value;
+        const students = gradeData[batch].students;
+        const tbody = document.getElementById('gradeTableBody');
+        tbody.innerHTML = '';
+
+        students.forEach((student, index) => {
+            const row = document.createElement('tr');
+            const isComp = isStudentCompetent(student.units);
+            
+            row.innerHTML = `
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 500;">${student.name}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                    <select onchange="updateUnitGrade('${batch}', ${index}, 'safety', this.value)" style="padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white; min-width: 80px;">
+                        <option value="NYC" ${student.units.safety === 'NYC' ? 'selected' : ''}>NYC</option>
+                        <option value="C" ${student.units.safety === 'C' ? 'selected' : ''}>C</option>
+                    </select>
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                    <select onchange="updateUnitGrade('${batch}', ${index}, 'operation', this.value)" style="padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white; min-width: 80px;">
+                        <option value="NYC" ${student.units.operation === 'NYC' ? 'selected' : ''}>NYC</option>
+                        <option value="C" ${student.units.operation === 'C' ? 'selected' : ''}>C</option>
+                    </select>
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                    <select onchange="updateUnitGrade('${batch}', ${index}, 'troubleshooting', this.value)" style="padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white; min-width: 80px;">
+                        <option value="NYC" ${student.units.troubleshooting === 'NYC' ? 'selected' : ''}>NYC</option>
+                        <option value="C" ${student.units.troubleshooting === 'C' ? 'selected' : ''}>C</option>
+                    </select>
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                    <select onchange="updateUnitGrade('${batch}', ${index}, 'documentation', this.value)" style="padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white; min-width: 80px;">
+                        <option value="NYC" ${student.units.documentation === 'NYC' ? 'selected' : ''}>NYC</option>
+                        <option value="C" ${student.units.documentation === 'C' ? 'selected' : ''}>C</option>
+                    </select>
+                </td>
+                <td style="text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                    ${isComp ? 
+                        `<button class="btn btn-success" onclick="addCompetentStudent('${batch}', ${index})" style="padding: 4px 12px; background: #10b981; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px;">➕ Add</button>` : 
+                        `<span style="color: #94a3b8; font-size: 12px;">—</span>`
+                    }
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Update unit grade
+    function updateUnitGrade(batch, index, unit, value) {
+        const student = gradeData[batch].students[index];
+        student.units[unit] = value;
+        updateGradeTable();
+        updateProgressChart();
+    }
+
+    // Add competent student to list
+    function addCompetentStudent(batch, index) {
+        const student = gradeData[batch].students[index];
+        const fullName = student.name;
+        
+        if (!competentStudents.includes(fullName)) {
+            competentStudents.push(fullName);
+            updateCompetentList();
+        }
+        
+        // Update button to show added
+        const container = document.getElementById('competentContainer');
+        const alert = document.getElementById('copyAlert');
+        alert.style.display = 'block';
+        alert.innerHTML = `✅ ${fullName} added to competent list.`;
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 3000);
+    }
+
+    // Update competent list display
+    function updateCompetentList() {
+        const container = document.getElementById('competentContainer');
+        if (competentStudents.length === 0) {
+            container.textContent = '--- No competent students added yet ---';
+        } else {
+            container.textContent = competentStudents.join('\n');
+        }
+    }
+
+    // Copy competent list to clipboard
+    function copyCompetentList() {
+        const text = document.getElementById('competentContainer').textContent;
+        if (text.includes('No competent students')) {
+            const alert = document.getElementById('copyAlert');
+            alert.style.display = 'block';
+            alert.style.background = '#fef2f2';
+            alert.style.borderColor = '#fee2e2';
+            alert.style.color = '#991b1b';
+            alert.innerHTML = '⚠️ No competent students to copy.';
+            setTimeout(() => {
+                alert.style.display = 'none';
+                alert.style.background = '#f0fdf4';
+                alert.style.borderColor = '#d1fae5';
+                alert.style.color = '#065f46';
+            }, 3000);
+            return;
+        }
+        
+        navigator.clipboard.writeText(text).then(() => {
+            const alert = document.getElementById('copyAlert');
+            alert.style.display = 'block';
+            alert.innerHTML = '✅ Competent list copied to clipboard!';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        });
+    }
+
+    // Update progress chart
+    function updateProgressChart() {
+        const batch = document.getElementById('progressBatchSelect').value;
+        const students = gradeData[batch].students;
+        const container = document.getElementById('progressChartContainer');
+        container.innerHTML = '';
+
+        students.forEach(student => {
+            const units = student.units;
+            const totalUnits = 4;
+            const completed = Object.values(units).filter(v => v === 'C').length;
+            const percentage = Math.round((completed / totalUnits) * 100);
+            const isComplete = percentage === 100;
+            
+            const div = document.createElement('div');
+            div.style.cssText = 'margin-bottom: 16px;';
+            
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-weight: 500; font-size: 14px; color: #1e293b;">${student.name}</span>
+                    <span style="font-size: 14px; font-weight: 600; color: ${isComplete ? '#10b981' : '#64748b'};">${percentage}% Complete</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="progress-track" style="flex: 1; background: #e2e8f0; border-radius: 20px; height: 14px; overflow: hidden;">
+                        <div class="progress-fill ${isComplete ? 'complete' : ''}" style="width: ${percentage}%; height: 100%; background: ${isComplete ? '#10b981' : '#3b82f6'}; transition: width 0.4s; border-radius: 20px;"></div>
+                    </div>
+                    ${isComplete ? 
+                        `<span class="badge badge-success" style="background: #d1fae5; color: #065f46; padding: 2px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap;">✅ NC2 Ready</span>` : 
+                        `<span style="font-size: 12px; color: #94a3b8; white-space: nowrap;">${completed}/${totalUnits} units</span>`
+                    }
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Tab switching
+    function switchProgressTab(tabId, btn) {
+        // Hide all tabs
+        document.querySelectorAll('.progress-tab').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        // Show selected tab
+        document.getElementById(tabId).style.display = 'block';
+        
+        // Update button styles
+        document.querySelectorAll('.progress-tab-btn').forEach(b => {
+            b.style.borderBottom = '3px solid transparent';
+            b.style.color = '#64748b';
+            b.style.fontWeight = '500';
+        });
+        btn.style.borderBottom = '3px solid #f59e0b';
+        btn.style.color = '#0f172a';
+        btn.style.fontWeight = '600';
+
+        // Update content when switching
+        if (tabId === 'tabGradeEncoding') {
+            updateGradeTable();
+        }
+        if (tabId === 'tabProgressChart') {
+            updateProgressChart();
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateGradeTable();
+        updateProgressChart();
+        updateCompetentList();
+    });
+</script>
+
+<style>
+    .badge-success {
+        background: #d1fae5 !important;
+        color: #065f46 !important;
+    }
+    .progress-tab {
+        animation: fadeIn 0.2s ease;
+    }
+    .progress-fill.complete {
+        background: #10b981 !important;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+        <div id="t6-mock" class="mockup-container">
+            <div class="feature-meta">Module Component Panel: Progress Charts</div>
+            <div class="task-title">Review Student Progress Charts</div>
+            <p style="font-size: 14px; color:#475569;">[Interactive Shell Sandbox View Mode Only]</p>
+        </div>
+
+        <div id="t8-mock" class="mockup-container">
+    <div class="feature-meta">Module Component Panel: Inventory</div>
+    <div class="task-title">Laboratory Borrower Requests & Logs</div>
+    
+    <!-- Active Pending Borrower Queues -->
+    <div class="interactive-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+        <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">📋 Active Pending Borrower Queues</div>
+        
+        <!-- Filter by date for queues -->
+        <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569;">Filter by Date:</label>
+                <input type="date" id="queueDateFilter" onchange="filterQueues()" style="padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white;">
+            </div>
+            <button class="btn btn-outline" onclick="resetQueueFilter()" style="padding: 6px 16px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Reset Filter</button>
+        </div>
+        
+        <!-- Request Card 1 -->
+        <div id="borrowRequest1" class="alert alert-info queue-item" style="display: block; padding: 20px; margin-bottom: 16px; border-left: 4px solid #3b82f6; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px;" data-date="2026-07-08">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong style="font-size: 15px;">Request Token: #BR-9402</strong>
+                <span class="badge badge-neutral" style="background: #e2e8f0; color: #475569; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Pending Review</span>
+            </div>
+            <p style="font-size: 14px; margin-bottom: 12px; color: #1e293b;">
+                <strong>Borrower Trainee:</strong> Kenji Sato <br>
+                <strong>Requested Instrument:</strong> Digital Multimeter Fluke-115 <br>
+                <strong>Request Date:</strong> 2026-07-08 14:15
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-success" onclick="processBorrowRequest('BR-9402', 'Approved', 'Kenji Sato', 'Digital Multimeter Fluke-115')" style="padding: 8px 20px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    🟢 Approve Allocation
+                </button>
+                <button class="btn btn-danger" onclick="toggleFeedbackUI('BR-9402')" style="padding: 8px 20px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    🛑 Trigger Feedback Routing
+                </button>
+            </div>
+
+            <!-- Feedback Form -->
+            <div id="feedbackForm_BR-9402" style="margin-top: 15px; display: none; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <label for="feedbackReason_BR-9402" style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Select System Failure Reason for Feedback Exception:</label>
+                <select id="feedbackReason_BR-9402" onchange="toggleOtherReason('BR-9402')" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white; margin-bottom: 10px; max-width: 400px;">
+                    <option value="Target hardware apparatus is not in inventory stock yet.">Target hardware apparatus is not in inventory stock yet</option>
+                    <option value="The target borrower has not returned their previous tools.">The target borrower has not returned their previous tools</option>
+                    <option value="The equipment is currently scheduled for maintenance.">The equipment is currently scheduled for maintenance</option>
+                    <option value="other">Other (Please specify)</option>
+                </select>
+                <div id="otherReason_BR-9402" style="display: none; margin-bottom: 10px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Please specify the reason:</label>
+                    <input type="text" id="otherReasonInput_BR-9402" placeholder="Enter custom reason..." style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; max-width: 400px;">
+                </div>
+                <button class="btn btn-primary" onclick="processBorrowRequest('BR-9402', 'Rejected/Feedback Sent', 'Kenji Sato', 'Digital Multimeter Fluke-115', getFeedbackReason('BR-9402'))" style="padding: 8px 20px; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    Dispatch Feedback
+                </button>
+            </div>
+        </div>
+
+        <!-- Request Card 2 -->
+        <div id="borrowRequest2" class="alert alert-info queue-item" style="display: block; padding: 20px; margin-bottom: 16px; border-left: 4px solid #3b82f6; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px;" data-date="2026-07-08">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong style="font-size: 15px;">Request Token: #BR-9403</strong>
+                <span class="badge badge-neutral" style="background: #e2e8f0; color: #475569; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Pending Review</span>
+            </div>
+            <p style="font-size: 14px; margin-bottom: 12px; color: #1e293b;">
+                <strong>Borrower Trainee:</strong> Maria Santos <br>
+                <strong>Requested Instrument:</strong> Oscilloscope Tektronix TBS1052B <br>
+                <strong>Request Date:</strong> 2026-07-08 13:45
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-success" onclick="processBorrowRequest('BR-9403', 'Approved', 'Maria Santos', 'Oscilloscope Tektronix TBS1052B')" style="padding: 8px 20px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    🟢 Approve Allocation
+                </button>
+                <button class="btn btn-danger" onclick="toggleFeedbackUI('BR-9403')" style="padding: 8px 20px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    🛑 Trigger Feedback Routing
+                </button>
+            </div>
+
+            <!-- Feedback Form -->
+            <div id="feedbackForm_BR-9403" style="margin-top: 15px; display: none; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <label for="feedbackReason_BR-9403" style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Select System Failure Reason for Feedback Exception:</label>
+                <select id="feedbackReason_BR-9403" onchange="toggleOtherReason('BR-9403')" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white; margin-bottom: 10px; max-width: 400px;">
+                    <option value="Target hardware apparatus is not in inventory stock yet.">Target hardware apparatus is not in inventory stock yet</option>
+                    <option value="The target borrower has not returned their previous tools.">The target borrower has not returned their previous tools</option>
+                    <option value="The equipment is currently scheduled for maintenance.">The equipment is currently scheduled for maintenance</option>
+                    <option value="other">Other (Please specify)</option>
+                </select>
+                <div id="otherReason_BR-9403" style="display: none; margin-bottom: 10px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Please specify the reason:</label>
+                    <input type="text" id="otherReasonInput_BR-9403" placeholder="Enter custom reason..." style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; max-width: 400px;">
+                </div>
+                <button class="btn btn-primary" onclick="processBorrowRequest('BR-9403', 'Rejected/Feedback Sent', 'Maria Santos', 'Oscilloscope Tektronix TBS1052B', getFeedbackReason('BR-9403'))" style="padding: 8px 20px; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    Dispatch Feedback
+                </button>
+            </div>
+        </div>
+
+        <!-- Request Card 3 -->
+        <div id="borrowRequest3" class="alert alert-info queue-item" style="display: block; padding: 20px; margin-bottom: 0; border-left: 4px solid #3b82f6; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px;" data-date="2026-07-07">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong style="font-size: 15px;">Request Token: #BR-9404</strong>
+                <span class="badge badge-neutral" style="background: #e2e8f0; color: #475569; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Pending Review</span>
+            </div>
+            <p style="font-size: 14px; margin-bottom: 12px; color: #1e293b;">
+                <strong>Borrower Trainee:</strong> James O'Brien <br>
+                <strong>Requested Instrument:</strong> Soldering Station Hakko FX-888D <br>
+                <strong>Request Date:</strong> 2026-07-07 12:30
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-success" onclick="processBorrowRequest('BR-9404', 'Approved', 'James O\'Brien', 'Soldering Station Hakko FX-888D')" style="padding: 8px 20px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    🟢 Approve Allocation
+                </button>
+                <button class="btn btn-danger" onclick="toggleFeedbackUI('BR-9404')" style="padding: 8px 20px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    🛑 Trigger Feedback Routing
+                </button>
+            </div>
+
+            <!-- Feedback Form -->
+            <div id="feedbackForm_BR-9404" style="margin-top: 15px; display: none; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <label for="feedbackReason_BR-9404" style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Select System Failure Reason for Feedback Exception:</label>
+                <select id="feedbackReason_BR-9404" onchange="toggleOtherReason('BR-9404')" style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white; margin-bottom: 10px; max-width: 400px;">
+                    <option value="Target hardware apparatus is not in inventory stock yet.">Target hardware apparatus is not in inventory stock yet</option>
+                    <option value="The target borrower has not returned their previous tools.">The target borrower has not returned their previous tools</option>
+                    <option value="The equipment is currently scheduled for maintenance.">The equipment is currently scheduled for maintenance</option>
+                    <option value="other">Other (Please specify)</option>
+                </select>
+                <div id="otherReason_BR-9404" style="display: none; margin-bottom: 10px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Please specify the reason:</label>
+                    <input type="text" id="otherReasonInput_BR-9404" placeholder="Enter custom reason..." style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; max-width: 400px;">
+                </div>
+                <button class="btn btn-primary" onclick="processBorrowRequest('BR-9404', 'Rejected/Feedback Sent', 'James O\'Brien', 'Soldering Station Hakko FX-888D', getFeedbackReason('BR-9404'))" style="padding: 8px 20px; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                    Dispatch Feedback
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integrated Historical Distribution Logs -->
+    <div class="interactive-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px;">
+        <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">🕒 Integrated Historical Borrow & Activity Lifecycle Logs</div>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Complete history of all borrower requests, approvals, rejections, and returns.</p>
+        
+        <!-- Filter controls -->
+        <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569;">Filter by Status:</label>
+                <select id="logFilter" onchange="filterLogs()" style="padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white;">
+                    <option value="all">All</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569;">Filter by Date:</label>
+                <input type="date" id="logDateFilter" onchange="filterLogs()" style="padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white;">
+            </div>
+            <button class="btn btn-outline" onclick="resetLogFilters()" style="padding: 6px 16px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Reset Filters</button>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <thead>
+                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Timestamp</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Student</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Tool Description</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Resolution Status</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Feedback / Notes</th>
+                </tr>
+            </thead>
+            <tbody id="historicalLogTableBody">
+                <!-- Rows injected by JS -->
+            </tbody>
+        </table>
+        
+        <div id="noLogsMessage" style="display: none; text-align: center; padding: 40px 0; color: #94a3b8; font-size: 14px;">
+            No logs found. Process a borrower request to see history here.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Historical log data - persistent, never deleted
+    let historicalLogs = [
+        {
+            id: 1,
+            timestamp: '2026-07-08 14:22',
+            date: '2026-07-08',
+            student: 'Sarah Jenkins',
+            tool: 'Oscilloscope Tektronix',
+            status: 'Returned',
+            notes: 'Clean return - equipment in good condition'
+        },
+        {
+            id: 2,
+            timestamp: '2026-07-08 11:15',
+            date: '2026-07-08',
+            student: 'David Kim',
+            tool: 'Digital Multimeter Fluke-115',
+            status: 'Approved',
+            notes: 'Approved for lab session'
+        },
+        {
+            id: 3,
+            timestamp: '2026-07-07 16:45',
+            date: '2026-07-07',
+            student: 'Elena Rostova',
+            tool: 'Soldering Station Hakko FX-888D',
+            status: 'Returned',
+            notes: 'Returned - tip needs replacement'
+        },
+        {
+            id: 4,
+            timestamp: '2026-07-07 10:30',
+            date: '2026-07-07',
+            student: 'Marcus Sterling',
+            tool: 'Function Generator GW Instek',
+            status: 'Rejected',
+            notes: 'Target hardware apparatus is not in inventory stock yet.'
+        },
+        {
+            id: 5,
+            timestamp: '2026-07-06 15:20',
+            date: '2026-07-06',
+            student: 'Yuki Tanaka',
+            tool: 'Oscilloscope Tektronix TBS1052B',
+            status: 'Approved',
+            notes: 'Approved for advanced lab'
+        }
+    ];
+
+    let logIdCounter = 6;
+
+    // Toggle other reason input
+    function toggleOtherReason(requestId) {
+        const select = document.getElementById(`feedbackReason_${requestId}`);
+        const otherDiv = document.getElementById(`otherReason_${requestId}`);
+        if (select.value === 'other') {
+            otherDiv.style.display = 'block';
+        } else {
+            otherDiv.style.display = 'none';
+        }
+    }
+
+    // Get feedback reason (with custom input if "other" selected)
+    function getFeedbackReason(requestId) {
+        const select = document.getElementById(`feedbackReason_${requestId}`);
+        if (select.value === 'other') {
+            const input = document.getElementById(`otherReasonInput_${requestId}`);
+            return input.value || 'Custom reason not specified.';
+        }
+        return select.value;
+    }
+
+    // Filter queues by date
+    function filterQueues() {
+        const filterDate = document.getElementById('queueDateFilter').value;
+        const items = document.querySelectorAll('.queue-item');
+        let visibleCount = 0;
+        
+        items.forEach(item => {
+            const itemDate = item.getAttribute('data-date');
+            if (!filterDate || itemDate === filterDate) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Show message if no items visible
+        const noItemsMsg = document.getElementById('noQueuesMessage');
+        if (!noItemsMsg) {
+            const msg = document.createElement('div');
+            msg.id = 'noQueuesMessage';
+            msg.style.cssText = 'text-align: center; padding: 20px; color: #94a3b8; font-size: 14px;';
+            msg.textContent = 'No pending requests for the selected date.';
+            const container = document.querySelector('.interactive-card:first-child');
+            if (visibleCount === 0 && !container.querySelector('#noQueuesMessage')) {
+                container.appendChild(msg);
+            } else if (visibleCount > 0 && container.querySelector('#noQueuesMessage')) {
+                container.querySelector('#noQueuesMessage').remove();
+            }
+        } else {
+            if (visibleCount > 0) {
+                noItemsMsg.remove();
+            }
+        }
+    }
+
+    // Reset queue filter
+    function resetQueueFilter() {
+        document.getElementById('queueDateFilter').value = '';
+        filterQueues();
+    }
+
+    // Toggle feedback UI
+    function toggleFeedbackUI(requestId) {
+        const feedbackForm = document.getElementById(`feedbackForm_${requestId}`);
+        if (feedbackForm) {
+            feedbackForm.style.display = feedbackForm.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
+    // Process borrow request
+    function processBorrowRequest(requestId, status, student, tool, reason = '') {
+        // Hide the request card
+        const requestNum = requestId.replace('BR-', '');
+        const requestCard = document.getElementById(`borrowRequest${requestNum}`);
+        if (requestCard) {
+            requestCard.style.display = 'none';
+        }
+        
+        // Hide any open feedback forms
+        const feedbackForm = document.getElementById(`feedbackForm_${requestId}`);
+        if (feedbackForm) {
+            feedbackForm.style.display = 'none';
+        }
+        
+        // Create log entry
+        const now = new Date();
+        const timestamp = now.toLocaleString('en-US', { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+        const dateStr = now.toISOString().split('T')[0];
+        
+        let statusDisplay = status;
+        let notes = reason || 'Operational pass authorized.';
+        
+        if (status === 'Approved') {
+            statusDisplay = 'Approved';
+        } else if (status === 'Rejected/Feedback Sent') {
+            statusDisplay = 'Rejected';
+        }
+        
+        const logEntry = {
+            id: logIdCounter++,
+            timestamp: timestamp,
+            date: dateStr,
+            student: student,
+            tool: tool,
+            status: statusDisplay,
+            notes: notes
+        };
+        
+        historicalLogs.unshift(logEntry); // Add to beginning of array
+        
+        // Show success message
+        const alertDiv = document.createElement('div');
+        alertDiv.style.cssText = `
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            background: ${status === 'Approved' ? '#f0fdf4' : '#fef2f2'};
+            border: 1px solid ${status === 'Approved' ? '#d1fae5' : '#fee2e2'};
+            color: ${status === 'Approved' ? '#065f46' : '#991b1b'};
+            font-size: 14px;
+            font-weight: 500;
+        `;
+        alertDiv.innerHTML = `
+            ✅ Request ${requestId} has been <strong>${status}</strong>.<br>
+            <span style="font-size: 13px; font-weight: 400; color: #64748b;">
+                ${status === 'Approved' ? 'Asset status updated in tool log database.' : 'Feedback dispatched to student.'}
+            </span>
+        `;
+        
+        // Insert alert before the historical logs section
+        const card = document.querySelector('.interactive-card:last-child');
+        card.parentNode.insertBefore(alertDiv, card);
+        
+        // Remove alert after 5 seconds
+        setTimeout(() => {
+            alertDiv.style.display = 'none';
+        }, 5000);
+        
+        // Re-render logs
+        filterLogs();
+        filterQueues();
+    }
+
+    // Render historical logs
+    function renderLogs(statusFilter = 'all', dateFilter = '') {
+        const tbody = document.getElementById('historicalLogTableBody');
+        const noLogsMsg = document.getElementById('noLogsMessage');
+        tbody.innerHTML = '';
+        
+        let filteredLogs = historicalLogs;
+        
+        // Filter by status
+        if (statusFilter !== 'all') {
+            filteredLogs = filteredLogs.filter(log => log.status === statusFilter);
+        }
+        
+        // Filter by date
+        if (dateFilter) {
+            filteredLogs = filteredLogs.filter(log => log.date === dateFilter);
+        }
+        
+        if (filteredLogs.length === 0) {
+            noLogsMsg.style.display = 'block';
+            return;
+        }
+        noLogsMsg.style.display = 'none';
+        
+        filteredLogs.forEach(log => {
+            const row = document.createElement('tr');
+            let statusBadge;
+            if (log.status === 'Returned') {
+                statusBadge = '<span class="badge badge-success" style="background: #d1fae5; color: #065f46; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Returned</span>';
+            } else if (log.status === 'Approved') {
+                statusBadge = '<span class="badge" style="background: #dbeafe; color: #1e40af; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Approved</span>';
+            } else if (log.status === 'Rejected' || log.status === 'Rejected/Feedback Sent') {
+                statusBadge = '<span class="badge badge-danger" style="background: #fee2e2; color: #991b1b; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Rejected</span>';
+            } else {
+                statusBadge = `<span class="badge" style="background: #e2e8f0; color: #475569; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">${log.status}</span>`;
+            }
+            
+            row.innerHTML = `
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #475569;">${log.timestamp}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 500;">${log.student}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${log.tool}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${statusBadge}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">${log.notes || '-'}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Filter logs (status + date)
+    function filterLogs() {
+        const statusFilter = document.getElementById('logFilter').value;
+        const dateFilter = document.getElementById('logDateFilter').value;
+        renderLogs(statusFilter, dateFilter);
+    }
+
+    // Reset log filters
+    function resetLogFilters() {
+        document.getElementById('logFilter').value = 'all';
+        document.getElementById('logDateFilter').value = '';
+        renderLogs('all', '');
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        renderLogs('all', '');
+        // Set default date for queue filter
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('queueDateFilter').value = today;
+        filterQueues();
+    });
+</script>
+
+<style>
+    .badge-success {
+        background: #d1fae5 !important;
+        color: #065f46 !important;
+    }
+    .badge-danger {
+        background: #fee2e2 !important;
+        color: #991b1b !important;
+    }
+    .mockup-container {
+        animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+        <div id="t10-mock" class="mockup-container">
+    <div class="feature-meta">Module Component Panel: Approvals & Administrative</div>
+    <div class="task-title">Course Withdrawal Approval Workspace</div>
+    
+    <!-- Stats Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: #f59e0b;">3</div>
+            <div style="font-size: 13px; color: #64748b;">Pending Withdrawals</div>
+        </div>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: #10b981;">12</div>
+            <div style="font-size: 13px; color: #64748b;">Approved This Month</div>
+        </div>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: #ef4444;">2</div>
+            <div style="font-size: 13px; color: #64748b;">Rejected This Month</div>
+        </div>
+    </div>
+
+    <!-- Pending Withdrawals List -->
+    <div class="interactive-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+        <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">📋 Pending Withdrawal Requests</div>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Review student hardship justifications and process exit requests.</p>
+        
+        <!-- Filter controls -->
+        <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569;">Filter by Status:</label>
+                <select id="withdrawalFilter" onchange="filterWithdrawals()" style="padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white;">
+                    <option value="all">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 13px; font-weight: 600; color: #475569;">Search:</label>
+                <input type="text" id="withdrawalSearch" onkeyup="filterWithdrawals()" placeholder="Search by name or ID..." style="padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; background: white; width: 200px;">
+            </div>
+        </div>
+
+        <!-- Withdrawal Request 1 -->
+        <div id="withdrawal1" class="withdrawal-item" style="background: #fef9e7; border: 1px solid #fde68a; border-radius: 8px; padding: 20px; margin-bottom: 16px; border-left: 4px solid #f59e0b;" data-status="pending" data-name="Jordan Amore" data-id="WD-0294">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <strong style="font-size: 15px;">Withdrawal Request #WD-0294</strong>
+                    <span class="badge badge-neutral" style="background: #f59e0b; color: white; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 10px;">Pending Review</span>
+                </div>
+                <span style="font-size: 13px; color: #64748b;">Submitted: 2026-07-08 09:30</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <strong style="font-size: 14px; color: #1e293b;">Trainee Information</strong>
+                    <p style="font-size: 14px; color: #475569; margin-top: 4px;">
+                        <strong>Name:</strong> Jordan Amore<br>
+                        <strong>Program:</strong> CSS-NC2-2026A<br>
+                        <strong>Student ID:</strong> STU-2026-0458
+                    </p>
+                </div>
+                <div>
+                    <strong style="font-size: 14px; color: #1e293b;">Hardship Justification</strong>
+                    <p style="font-size: 14px; color: #475569; margin-top: 4px; background: #f8fafc; padding: 8px 12px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                        "Family relocation out of region due to domestic workspace transfer constraints. 
+                        Unable to continue attending classes physically. Requesting immediate withdrawal."
+                    </p>
+                </div>
+            </div>
+
+            <!-- Asset Return Checkboxes -->
+            <div style="background: #f8fafc; padding: 16px; border-radius: 6px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+                <strong style="font-size: 14px; color: #1e293b; display: block; margin-bottom: 10px;">🛡️ Verify Institutional Asset Returns</strong>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; cursor: pointer;">
+                    <input type="checkbox" id="idCheck1" onchange="checkClearance('1')" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-size: 14px;">Student ID Card Asset has been Returned</span>
+                </label>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="uniformCheck1" onchange="checkClearance('1')" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-size: 14px;">Institutional Program Uniform has been Returned</span>
+                </label>
+            </div>
+
+            <!-- Gating Warning -->
+            <div id="warningBox1" class="alert alert-danger" style="display: block; padding: 12px 16px; border-radius: 6px; background: #fef2f2; border: 1px solid #fee2e2; border-left: 4px solid #ef4444; margin-bottom: 16px;">
+                <strong style="color: #991b1b;">⚠️ Gating Exception Active:</strong> You must check off both the Uniform and ID card asset return checkboxes before the system unlocks approval rights.
+            </div>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button id="approveBtn1" class="btn btn-success" disabled onclick="processWithdrawal('1', 'approved')" style="padding: 10px 24px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                    ✅ Approve Program Exit Adjustment
+                </button>
+                <button class="btn btn-danger" onclick="rejectWithdrawal('1')" style="padding: 10px 24px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                    🛑 Reject Withdrawal
+                </button>
+            </div>
+        </div>
+
+        <!-- Withdrawal Request 2 -->
+        <div id="withdrawal2" class="withdrawal-item" style="background: #fef9e7; border: 1px solid #fde68a; border-radius: 8px; padding: 20px; margin-bottom: 16px; border-left: 4px solid #f59e0b;" data-status="pending" data-name="Maria Santos" data-id="WD-0295">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <strong style="font-size: 15px;">Withdrawal Request #WD-0295</strong>
+                    <span class="badge badge-neutral" style="background: #f59e0b; color: white; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 10px;">Pending Review</span>
+                </div>
+                <span style="font-size: 13px; color: #64748b;">Submitted: 2026-07-07 14:20</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <strong style="font-size: 14px; color: #1e293b;">Trainee Information</strong>
+                    <p style="font-size: 14px; color: #475569; margin-top: 4px;">
+                        <strong>Name:</strong> Maria Santos<br>
+                        <strong>Program:</strong> HKS-NC2-2026B<br>
+                        <strong>Student ID:</strong> STU-2026-0392
+                    </p>
+                </div>
+                <div>
+                    <strong style="font-size: 14px; color: #1e293b;">Hardship Justification</strong>
+                    <p style="font-size: 14px; color: #475569; margin-top: 4px; background: #f8fafc; padding: 8px 12px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                        "Medical emergency requiring extended hospitalization and recovery period. 
+                        Unable to continue coursework for the remainder of the term."
+                    </p>
+                </div>
+            </div>
+
+            <!-- Asset Return Checkboxes -->
+            <div style="background: #f8fafc; padding: 16px; border-radius: 6px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+                <strong style="font-size: 14px; color: #1e293b; display: block; margin-bottom: 10px;">🛡️ Verify Institutional Asset Returns</strong>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; cursor: pointer;">
+                    <input type="checkbox" id="idCheck2" onchange="checkClearance('2')" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-size: 14px;">Student ID Card Asset has been Returned</span>
+                </label>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="uniformCheck2" onchange="checkClearance('2')" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-size: 14px;">Institutional Program Uniform has been Returned</span>
+                </label>
+            </div>
+
+            <!-- Gating Warning -->
+            <div id="warningBox2" class="alert alert-danger" style="display: block; padding: 12px 16px; border-radius: 6px; background: #fef2f2; border: 1px solid #fee2e2; border-left: 4px solid #ef4444; margin-bottom: 16px;">
+                <strong style="color: #991b1b;">⚠️ Gating Exception Active:</strong> You must check off both the Uniform and ID card asset return checkboxes before the system unlocks approval rights.
+            </div>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button id="approveBtn2" class="btn btn-success" disabled onclick="processWithdrawal('2', 'approved')" style="padding: 10px 24px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                    ✅ Approve Program Exit Adjustment
+                </button>
+                <button class="btn btn-danger" onclick="rejectWithdrawal('2')" style="padding: 10px 24px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                    🛑 Reject Withdrawal
+                </button>
+            </div>
+        </div>
+
+        <!-- Withdrawal Request 3 -->
+        <div id="withdrawal3" class="withdrawal-item" style="background: #fef9e7; border: 1px solid #fde68a; border-radius: 8px; padding: 20px; margin-bottom: 0; border-left: 4px solid #f59e0b;" data-status="pending" data-name="James O'Brien" data-id="WD-0296">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <strong style="font-size: 15px;">Withdrawal Request #WD-0296</strong>
+                    <span class="badge badge-neutral" style="background: #f59e0b; color: white; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 10px;">Pending Review</span>
+                </div>
+                <span style="font-size: 13px; color: #64748b;">Submitted: 2026-07-06 11:45</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <strong style="font-size: 14px; color: #1e293b;">Trainee Information</strong>
+                    <p style="font-size: 14px; color: #475569; margin-top: 4px;">
+                        <strong>Name:</strong> James O'Brien<br>
+                        <strong>Program:</strong> WLD-NC2-2026A<br>
+                        <strong>Student ID:</strong> STU-2026-0411
+                    </p>
+                </div>
+                <div>
+                    <strong style="font-size: 14px; color: #1e293b;">Hardship Justification</strong>
+                    <p style="font-size: 14px; color: #475569; margin-top: 4px; background: #f8fafc; padding: 8px 12px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                        "Financial hardship due to unexpected job loss in the family. 
+                        Seeking withdrawal to focus on supporting family needs."
+                    </p>
+                </div>
+            </div>
+
+            <!-- Asset Return Checkboxes -->
+            <div style="background: #f8fafc; padding: 16px; border-radius: 6px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+                <strong style="font-size: 14px; color: #1e293b; display: block; margin-bottom: 10px;">🛡️ Verify Institutional Asset Returns</strong>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; cursor: pointer;">
+                    <input type="checkbox" id="idCheck3" onchange="checkClearance('3')" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-size: 14px;">Student ID Card Asset has been Returned</span>
+                </label>
+                <label class="checkbox-container" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="uniformCheck3" onchange="checkClearance('3')" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span style="font-size: 14px;">Institutional Program Uniform has been Returned</span>
+                </label>
+            </div>
+
+            <!-- Gating Warning -->
+            <div id="warningBox3" class="alert alert-danger" style="display: block; padding: 12px 16px; border-radius: 6px; background: #fef2f2; border: 1px solid #fee2e2; border-left: 4px solid #ef4444; margin-bottom: 16px;">
+                <strong style="color: #991b1b;">⚠️ Gating Exception Active:</strong> You must check off both the Uniform and ID card asset return checkboxes before the system unlocks approval rights.
+            </div>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button id="approveBtn3" class="btn btn-success" disabled onclick="processWithdrawal('3', 'approved')" style="padding: 10px 24px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                    ✅ Approve Program Exit Adjustment
+                </button>
+                <button class="btn btn-danger" onclick="rejectWithdrawal('3')" style="padding: 10px 24px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                    🛑 Reject Withdrawal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal History -->
+    <div class="interactive-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px;">
+        <div class="card-title" style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">📊 Withdrawal Processing History</div>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">Complete record of all processed withdrawal requests with final dispositions.</p>
+        
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <thead>
+                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Request ID</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Student</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Date Submitted</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Status</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Processed By</th>
+                    <th style="text-align: left; padding: 12px; font-weight: 600; color: #475569;">Notes</th>
+                </tr>
+            </thead>
+            <tbody id="withdrawalHistoryBody">
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 500;">WD-0293</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">Elena Rostova</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">2026-07-05</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><span class="badge badge-success" style="background: #d1fae5; color: #065f46; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Approved</span></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">Admin User</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">Assets verified and returned</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 500;">WD-0292</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">David Kim</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">2026-07-04</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><span class="badge badge-danger" style="background: #fee2e2; color: #991b1b; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Rejected</span></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">Admin User</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">Insufficient justification provided</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Withdrawal status tracking
+    const withdrawalStatus = {
+        '1': { status: 'pending', idCheck: false, uniformCheck: false },
+        '2': { status: 'pending', idCheck: false, uniformCheck: false },
+        '3': { status: 'pending', idCheck: false, uniformCheck: false }
+    };
+
+    // Check clearance for withdrawal
+    function checkClearance(id) {
+        const idCheck = document.getElementById(`idCheck${id}`).checked;
+        const uniformCheck = document.getElementById(`uniformCheck${id}`).checked;
+        const warningBox = document.getElementById(`warningBox${id}`);
+        const approveBtn = document.getElementById(`approveBtn${id}`);
+        
+        withdrawalStatus[id].idCheck = idCheck;
+        withdrawalStatus[id].uniformCheck = uniformCheck;
+
+        if (idCheck && uniformCheck) {
+            warningBox.style.display = 'none';
+            approveBtn.disabled = false;
+        } else {
+            warningBox.style.display = 'block';
+            approveBtn.disabled = true;
+        }
+    }
+
+    // Process withdrawal (approve)
+    function processWithdrawal(id, action) {
+        const item = document.getElementById(`withdrawal${id}`);
+        const studentName = item.querySelector('div:first-child strong:first-child').textContent.replace('Withdrawal Request ', '');
+        const requestId = studentName.split(' ')[1] || `WD-029${id}`;
+        
+        // Update status
+        withdrawalStatus[id].status = action;
+        
+        // Update the UI
+        const statusBadge = item.querySelector('.badge');
+        const approveBtn = document.getElementById(`approveBtn${id}`);
+        
+        if (action === 'approved') {
+            statusBadge.textContent = 'Approved';
+            statusBadge.style.background = '#10b981';
+            statusBadge.style.color = 'white';
+            item.style.borderLeftColor = '#10b981';
+            item.style.background = '#f0fdf4';
+            item.style.borderColor = '#d1fae5';
+            approveBtn.disabled = true;
+            approveBtn.textContent = '✅ Approved';
+            approveBtn.style.background = '#9ca3af';
+            
+            // Add to history
+            addToHistory(requestId, studentName, 'Approved', 'Assets verified and returned');
+            
+            // Show success message
+            showNotification(`✅ Withdrawal ${requestId} approved. Termination token routed to Registrar Office.`, 'success');
+        }
+    }
+
+    // Reject withdrawal
+    function rejectWithdrawal(id) {
+        const item = document.getElementById(`withdrawal${id}`);
+        const requestId = item.querySelector('div:first-child strong:first-child').textContent.match(/#WD-\d+/)[0] || `WD-029${id}`;
+        const studentName = item.querySelector('div:first-child strong:first-child').textContent.replace('Withdrawal Request ', '').split(' ').slice(0, -1).join(' ');
+        
+        const reason = prompt('Please provide a reason for rejecting this withdrawal request:');
+        if (reason === null) return; // User cancelled
+        
+        if (!reason || reason.trim() === '') {
+            alert('Please provide a valid reason for rejection.');
+            return;
+        }
+        
+        // Update status
+        withdrawalStatus[id].status = 'rejected';
+        
+        // Update the UI
+        const statusBadge = item.querySelector('.badge');
+        const approveBtn = document.getElementById(`approveBtn${id}`);
+        
+        statusBadge.textContent = 'Rejected';
+        statusBadge.style.background = '#ef4444';
+        statusBadge.style.color = 'white';
+        item.style.borderLeftColor = '#ef4444';
+        item.style.background = '#fef2f2';
+        item.style.borderColor = '#fee2e2';
+        approveBtn.disabled = true;
+        approveBtn.textContent = '❌ Rejected';
+        approveBtn.style.background = '#9ca3af';
+        
+        // Disable reject button
+        const rejectBtn = item.querySelector('.btn-danger');
+        if (rejectBtn) {
+            rejectBtn.disabled = true;
+            rejectBtn.textContent = '❌ Rejected';
+            rejectBtn.style.background = '#9ca3af';
+        }
+        
+        // Add to history
+        addToHistory(requestId, studentName, 'Rejected', reason);
+        
+        showNotification(`🛑 Withdrawal ${requestId} rejected. Reason: ${reason}`, 'error');
+    }
+
+    // Add to history table
+    function addToHistory(requestId, studentName, status, notes) {
+        const tbody = document.getElementById('withdrawalHistoryBody');
+        const row = document.createElement('tr');
+        const today = new Date().toISOString().split('T')[0];
+        
+        const statusBadge = status === 'Approved' 
+            ? '<span class="badge badge-success" style="background: #d1fae5; color: #065f46; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Approved</span>'
+            : '<span class="badge badge-danger" style="background: #fee2e2; color: #991b1b; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;">Rejected</span>';
+        
+        row.innerHTML = `
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: 500;">${requestId}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${studentName}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${today}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${statusBadge}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">Admin User</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #64748b;">${notes}</td>
+        `;
+        tbody.prepend(row);
+        
+        // Update stats
+        updateStats();
+    }
+
+    // Update stats
+    function updateStats() {
+        const pending = document.querySelectorAll('[data-status="pending"]').length;
+        const approved = document.querySelectorAll('[data-status="approved"]').length;
+        const rejected = document.querySelectorAll('[data-status="rejected"]').length;
+        
+        const stats = document.querySelectorAll('.grid-cols-3 .text-center');
+        if (stats.length >= 3) {
+            // Update stats in the summary cards
+            document.querySelectorAll('.grid-cols-3 .text-center .text-2xl')[0].textContent = pending;
+            // We'll just update manually
+        }
+        
+        // Recalculate all stats
+        let pendingCount = 0, approvedCount = 0, rejectedCount = 0;
+        document.querySelectorAll('.withdrawal-item').forEach(item => {
+            const status = item.querySelector('.badge')?.textContent || '';
+            if (status === 'Pending Review' || status === 'pending') pendingCount++;
+            else if (status === 'Approved') approvedCount++;
+            else if (status === 'Rejected') rejectedCount++;
+        });
+        
+        // Update the stat cards
+        const statCards = document.querySelectorAll('.grid-cols-3 .text-center');
+        // We'll use the first three stat cards
+        if (document.querySelectorAll('.grid-cols-3 .text-center .text-2xl').length >= 3) {
+            const statValues = document.querySelectorAll('.grid-cols-3 .text-center .text-2xl');
+            statValues[0].textContent = pendingCount;
+            // The other stats are static for demo purposes
+        }
+    }
+
+    // Filter withdrawals
+    function filterWithdrawals() {
+        const filter = document.getElementById('withdrawalFilter').value;
+        const search = document.getElementById('withdrawalSearch').value.toLowerCase();
+        const items = document.querySelectorAll('.withdrawal-item');
+        
+        items.forEach(item => {
+            const status = item.querySelector('.badge')?.textContent || '';
+            const name = item.getAttribute('data-name') || '';
+            const id = item.getAttribute('data-id') || '';
+            
+            let show = true;
+            
+            // Filter by status
+            if (filter !== 'all') {
+                const statusMatch = status.toLowerCase().includes(filter);
+                const dataStatus = item.getAttribute('data-status');
+                show = (filter === dataStatus) || statusMatch;
+            }
+            
+            // Filter by search
+            if (show && search) {
+                show = name.toLowerCase().includes(search) || id.toLowerCase().includes(search);
+            }
+            
+            item.style.display = show ? 'block' : 'none';
+        });
+    }
+
+    // Show notification
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        const bgColor = type === 'success' ? '#f0fdf4' : '#fef2f2';
+        const borderColor = type === 'success' ? '#d1fae5' : '#fee2e2';
+        const textColor = type === 'success' ? '#065f46' : '#991b1b';
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: ${bgColor};
+            border: 1px solid ${borderColor};
+            border-left: 4px solid ${type === 'success' ? '#10b981' : '#ef4444'};
+            border-radius: 8px;
+            color: ${textColor};
+            font-size: 14px;
+            font-weight: 500;
+            max-width: 400px;
+            z-index: 9999;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 5000);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add slideIn animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            .grid-cols-3 {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+
+<style>
+    .badge-success {
+        background: #d1fae5 !important;
+        color: #065f46 !important;
+    }
+    .badge-danger {
+        background: #fee2e2 !important;
+        color: #991b1b !important;
+    }
+    .mockup-container {
+        animation: fadeIn 0.2s ease;
+    }
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+    .checkbox-container input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #3b82f6;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .withdrawal-item {
+        transition: all 0.3s ease;
+    }
+</style>
+
+    </div>
+
+    <div class="guide-panel">
+        <div id="guide-header-title" class="guide-title">Dashboard Instructions Guide</div>
+        <div id="steps-container-box">
+            </div>
+    </div>
+
+    <script>
+        // System Step-by-Step Data Store
+        const documentationLogDatabase = {
+            'dashboard-view': {
+                title: "Dashboard Instructions Guide",
+                steps: [
+                    { name: "Verify System Portal Base", desc: "Ensure you are securely logged into the authorized structural dashboard module matrix context overview." },
+                    { name: "Trigger Target Workspace Module", desc: "Click directly on any of the core functional component overview box units to launch its dedicated workflow engine environment container." }
+                ]
+            },
+            't1-mock': {
+    title: "Class & Student List Overview",
+    steps: [
+        { 
+            name: "Open Instructor Portal Dashboard", 
+            desc: "Navigate directly to your authorized Instructor workspace from the master SkillTrack deployment directory." 
+        },
+        { 
+            name: "Access Assigned Qualifications List", 
+            desc: "Locate the 'Assigned Qualifications' operational card block view containing your active teaching assignments." 
+        },
+        { 
+            name: "Select Target Training Batch Allocation", 
+            desc: "Locate your active structural class block (e.g., CSS-NC2-2026A) and select the corresponding item row configuration." 
+        },
+        { 
+            name: "Verify Active Enrollment Thresholds", 
+            desc: "Check the total headcount of registered active students listed inside the target batch ledger matrix. Check if the class meets the required minimum quorum of <strong>15 to 20 students</strong> to initialize institutional training programs." 
+        },
+        { 
+            name: "Configure Calendar Commencement Date", 
+            desc: "If the active headcount parameter successfully satisfies or surpasses the 15-20 minimum student limit rule, the calendar date input element will unlock. Proceed to choose an official term start date to lock the schedule in." 
+        }
+    ],
+    validation: {
+        title: "Validation Constraint Block",
+        desc: "If the total number of enrollees sits below the absolute minimum requirement of 15 students, the date picker system button remains completely locked and unclickable."
+    }
+},
+            't3-mock': {
+    title: "Attendance Management Module",
+    steps: [
+        { 
+            name: "Access Module Layer", 
+            desc: "Click the 'Attendance Management Module' item link directly within the left sidebar navigation deck." 
+        },
+        { 
+            name: "Select Target Training Batch", 
+            desc: "Inside the active view dashboard, locate the sub-navigation row interface, then click and press the class selection target item to load the corresponding trainee database layout." 
+        },
+        { 
+            name: "Configure Session Tracking Date", 
+            desc: "Choose the exact target calendar index day for which you are taking attendance operations." 
+        },
+        { 
+            name: "Modify Trainee Operational Attendance Status Indicators", 
+            desc: "Select from the dropdown selection arrays matching individual student rows to allocate status values: <strong>Present</strong>, <strong>Absent</strong>, or <strong>Late</strong>." 
+        },
+        { 
+            name: "Commit Daily Log Session Metrics", 
+            desc: "Click the 'Save Current Sheet Daily Record' input button to save the dataset configuration into your local relational instance layer." 
+        }
+    ]
+},
+            't5-mock': {
+    title: "Grade Encoding & Progress Chart",
+    steps: [
+        // Feature: Grade Encoding - Encode Competency Marks
+        { 
+            name: "Load Binary Competency Assessment Grid", 
+            desc: "Access the 'Competency Grade Encoding Matrix' tab view to display student records alongside structural core performance units." 
+        },
+        { 
+            name: "Apply Binary Grading Evaluation Choices", 
+            desc: "Evaluate laboratory performance and map specific unit dropdown metrics to either <strong>Competent (C)</strong> or <strong>Not Yet Competent (NYC)</strong> status markers." 
+        },
+        { 
+            name: "Trigger Competency Highlight Action", 
+            desc: "When a student successfully fulfills the required criteria parameters and hits the pass mark, the system flags them as competent. Upon validation, a dedicated <strong>Add Button</strong> icon dynamically appears on the far right edge of that student's row." 
+        },
+        { 
+            name: "Compile Batch Competency List", 
+            desc: "Press the newly rendered <strong>Add Button</strong>. This action pastes the target student's full name and profile strings directly down into a summary text box block located beneath the grid layout. This block holds the structured list of all competent students from the batch, ready to be quickly copied and pasted into external institutional files." 
+        },
+        // Horizontal line separator
+        
+        // Feature: Progress Chart of Students
+        { 
+            name: "Access Progress Chart of Students", 
+            desc: "Navigate directly to the student tracking summary chart grid panel within your primary grading context view." 
+        },
+        { 
+            name: "Evaluate Completion Percentage Indicators", 
+            desc: "Analyze visual status bars mapping overall module progress metrics across the assigned qualification's core competency criteria requirements." 
+        },
+        { 
+            name: "NC2 Readiness Rule", 
+            desc: "Trainees who hit <strong>100%</strong> completion parameters across all structural core competency nodes are flagged automatically for final institutional certification routines." 
+        }
+    ]
+},
+            't6-mock': {
+                title: "Progress Charts Guide Steps",
+                steps: [
+                    { name: "Evaluate Completion Percentage", desc: "Review aggregated live visual performance progress graphs analyzing core requirements limits." },
+                    { name: "Verify NC2 Readiness Flags", desc: "Trainees hitting clean 100% target limits append automatically to systemic registration batches rosters." }
+                ]
+            },
+            't8-mock': {
+    title: "Laboratory Asset Management",
+    steps: [
+        // Feature: Laboratory Asset Management - Approve Laboratory Borrower Requests & Logs
+        { 
+            name: "Load Active Pending Borrower Queues", 
+            desc: "Navigate to the 'Borrower Requests' component display card window to view pending trainee instrumentation and tool demands." 
+        },
+        { 
+            name: "Execute Request Determinations (Approve vs. Feedback)", 
+            desc: "Validate item fields and determine authorization pathways. Instructors can either choose to immediately click <strong>Approve</strong> to issue the equipment, or click <strong>Feedback</strong> to handle request blocks." 
+        },
+        { 
+            name: "Formulate Operational Feedback Dispatches", 
+            desc: "If clicking <strong>Feedback</strong>, select or input the specific tracking failure reason. Standard system reasons include: <em>Target hardware apparatus is not in inventory stock yet</em>, or <em>The target borrower has not returned their previous tools</em>." 
+        },
+        { 
+            name: "Asset Tracking Constraint", 
+            desc: "Approving a request modifies asset status values inside the tool log database, tracking records until the student checks the hardware items back in." 
+        },
+        { 
+            name: "Review Integrated Historical Distribution Logs", 
+            desc: "Scroll directly down below the active requests queue to view the integrated lifecycle logs dashboard layout positioned directly within the module workspace. Confirm clean return timestamps and historical tool intervals here." 
+        },
+        // Horizontal line separator
+        
+        { 
+            name: "Open Laboratory Assets & Logs", 
+            desc: "Click on the 'Laboratory Assets & Logs' module from the sidebar to access the complete asset tracking dashboard." 
+        },
+        { 
+            name: "Choose Filter Options", 
+            desc: "Apply filters by <strong>Status</strong> (All, Approved, Rejected, Returned) and by <strong>Date</strong> to narrow down the displayed logs." 
+        },
+        { 
+            name: "Check Logs for Verification", 
+            desc: "Review the filtered historical logs to verify asset distribution, returns, and any outstanding requests that require action." 
+        }
+    ]
+},
+           't10-mock': {
+    title: "Course Withdrawal Approval",
+    steps: [
+        { 
+            name: "Access Course Withdrawal Processing Matrix", 
+            desc: "Select the 'Withdrawal & Hardships' option block under the sidebar layout index directory mapping to list pending trainee resignation records." 
+        },
+        { 
+            name: "Review Listed Student Hardship Justifications", 
+            desc: "Read through explicit textual reasons submitted by trainees requesting official program exit processing adjustments." 
+        },
+        { 
+            name: "Verify Institutional Asset Return Checkboxes", 
+            desc: "Audit physical inventory obligations by ensuring the specific toggle checkboxes for <strong>Student ID Return</strong> and <strong>Uniform Return</strong> are both manually marked off." 
+        },
+        { 
+            name: "Liability Gatekeeper Rule", 
+            desc: "If either the Student ID or Uniform checkboxes remain unchecked, the administrative action engine will throw validation flags and disable the 'Approve Program Exit Adjustment' action button." 
+        },
+        { 
+            name: "Finalize Academic Drop Terminations", 
+            desc: "Once liability checkboxes are verified, click the now unlocked 'Approve Program Exit Adjustment' confirmation input element to finalize drop procedures and route the termination token to the Registrar Office." 
+        }
+    ]
+},
+        };
+
+        // Master Hub Tab Route Router Navigation Configuration
+        function navigateHub(targetMockContainerId) {
+            // Update center columns view layers
+            document.querySelectorAll('.mockup-container').forEach(box => box.classList.remove('active'));
+            const selectedBox = document.getElementById(targetMockContainerId);
+            if (selectedBox) selectedBox.classList.add('active');
+
+            // Synchronize left navigation text links indicators highlights
+            document.querySelectorAll('.task-link').forEach(link => link.classList.remove('active'));
+            let activeLinkId = 'link-dashboard';
+            if (targetMockContainerId === 't1-mock') activeLinkId = 'link-t1';
+            else if (targetMockContainerId === 't3-mock') activeLinkId = 'link-t3';
+            else if (targetMockContainerId === 't5-mock') activeLinkId = 'link-t5';
+          
+            else if (targetMockContainerId === 't8-mock') activeLinkId = 'link-t8';
+            else if (targetMockContainerId === 't10-mock') activeLinkId = 'link-t10';
+            
+            const linkedNavElement = document.getElementById(activeLinkId);
+            if (linkedNavElement) linkedNavElement.classList.add('active');
+
+            // Synchronize right companion instruction guide view columns dynamically
+            syncGuideCompanionDocumentationPanel(targetMockContainerId);
+        }
+
+        // Guide Column Sync Logic Framework Engine
+        function syncGuideCompanionDocumentationPanel(containerIdKey) {
+            const documentManifestData = documentationLogDatabase[containerIdKey];
+            const companionHeader = document.getElementById('guide-header-title');
+            const stepBodyLayoutWrapper = document.getElementById('steps-container-box');
+
+            if (!documentManifestData) return;
+
+            companionHeader.innerText = documentManifestData.title;
+            stepBodyLayoutWrapper.innerHTML = ''; // Flush preceding tracking blocks cleanly
+
+            documentManifestData.steps.forEach((stepItem, structuralIndex) => {
+                const stepBlockNode = document.createElement('div');
+                stepBlockNode.className = 'step-block';
+                stepBlockNode.innerHTML = `
+                    <div class="step-number">${structuralIndex + 1}</div>
+                    <div class="step-content">
+                        <div class="step-name">${stepItem.name}</div>
+                        <div class="step-description">${stepItem.desc}</div>
+                    </div>
+                `;
+                stepBodyLayoutWrapper.appendChild(stepBlockNode);
+            });
+        }
+
+        // Live Mockup 1: Interactive Choice Card Validation Logic Actions
+        function executeCardVerification(cardBatchIdElement, studentHeadcountQuantityValue, isQuorumConstraintValidFlag) {
+            // Clean active border configurations on alternate card blocks wrappers
+            document.querySelectorAll('.class-card').forEach(elementCardNode => {
+                elementCardNode.classList.remove('selected');
+            });
+
+            // Active choice state setting applied visually to selected node index item
+            const focusedCardBlockElement = document.getElementById(`card-${cardBatchIdElement}`);
+            if (focusedCardBlockElement) focusedCardBlockElement.classList.add('selected');
+
+            // Fetch dynamic operation items form container dependencies mapping properties
+            const conditionalDeckPanelWrapper = document.getElementById('cardActionContextDeck');
+            const targetCalendarInputDateNode = document.getElementById('commencementDate');
+            const systemicCalloutWarningCallBox = document.getElementById('t1WarningCallout');
+            const submissionScheduleLockButton = document.getElementById('lockScheduleBtn');
+
+            // Force open interactive sub-context execution panel structure array blocks
+            conditionalDeckPanelWrapper.style.display = 'block';
+
+            if (!isQuorumConstraintValidFlag) {
+                // LOCK STATE CONSTRAINTS RULES TRIGGERED SECURELY
+                targetCalendarInputDateNode.disabled = true;
+                targetCalendarInputDateNode.value = '';
+                systemicCalloutWarningCallBox.style.display = 'block';
+                submissionScheduleLockButton.disabled = true;
+            } else {
+                // PASSED ACCESSIBILITY VALIDATION: UNLOCK FORM ELEMENTS REGION
+                targetCalendarInputDateNode.disabled = false;
+                systemicCalloutWarningCallBox.style.display = 'none';
+                submissionScheduleLockButton.disabled = false;
+            }
+        }
+
+        // Launch Base Default State View Array Setup Instantly on Core Document Read Execution
+        window.addEventListener('DOMContentLoaded', () => {
+            syncGuideCompanionDocumentationPanel('dashboard-view');
+        });
+    </script>
+</body>
+</html>

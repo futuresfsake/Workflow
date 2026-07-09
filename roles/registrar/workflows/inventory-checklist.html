@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uniform and ID Inventory Checklist</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1d4ed8;
+            --bg-light: #f8fafc;
+            --border-muted: #e2e8f0;
+            --text-main: #334155;
+            --warning-bg: #fffbeb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+            --info-bg: #f0fdf4;
+            --info-border: #d1fae5;
+            --info-text: #15803d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-main); padding: 40px; min-height: 100vh; display: flex; justify-content: center; }
+
+        .container { width: 100%; max-width: 750px; background: white; padding: 40px; border-radius: 12px; border: 1px solid var(--border-muted); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+
+        .feature-meta { font-size: 11px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .task-title { font-size: 22px; color: var(--navy-dark); font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid var(--border-muted); padding-bottom: 12px; }
+        
+        /* Unified Continuous Vertical Stepper Engine */
+        .step-block { display: grid; grid-template-columns: 35px 1fr; gap: 15px; padding-bottom: 35px; position: relative; }
+        .step-block::after {
+            content: ''; position: absolute; left: 16px; top: 24px; bottom: -6px; width: 2px; background-color: var(--border-muted); z-index: 1;
+        }
+        .step-block:last-child::after { display: none; }
+        .step-block:last-child { padding-bottom: 5px; }
+
+        .step-number { 
+            font-size: 11px; font-weight: 700; color: #64748b; background: #e2e8f0;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; justify-self: center; z-index: 2; position: relative; border: 2px solid white;
+        }
+        .step-block.completed .step-number { background: #22c55e; color: white; border-color: #22c55e; }
+        .step-block.active .step-number { background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 0 0 3px #dbeafe; }
+        
+        .step-content { padding-top: 2px; }
+        .step-name { font-size: 14px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+        .step-description { font-size: 13px; color: #475569; line-height: 1.5; }
+        
+        /* Interactive Buttons */
+        .blue-highlight-btn { background: var(--accent-blue); color: white; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
+        .blue-highlight-btn:hover { background: var(--accent-blue-dark); }
+        .action-btn { background: #22c55e; color: white; border: none; padding: 10px 14px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .click-link { color: var(--accent-blue); font-weight: 600; cursor: pointer; text-decoration: none; background: none; border: none; }
+
+        /* Popup Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 12px; width: 620px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-muted); }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid var(--border-muted); border-radius: 6px; font-size: 13px; color: var(--navy-dark); background: var(--bg-light); }
+        
+        /* Table Layouts */
+        .inventory-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .inventory-table th { background: #f1f5f9; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; padding: 8px 12px; text-align: left; }
+        .inventory-table td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--border-muted); }
+
+        .status-badge { display: inline-block; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 4px; text-transform: uppercase; }
+        .badge-ok { background: #d1fae5; color: #065f46; }
+        .badge-low { background: #fee2e2; color: #991b1b; }
+
+        .step-callout { border-radius: 6px; padding: 10px; font-size: 12px; line-height: 1.4; margin-top: 10px; border: 1px solid var(--border-muted); background-color: var(--warning-bg); border-color: var(--warning-border); color: var(--warning-text); }
+        code { background-color: #e2e8f0; padding: 1px 4px; border-radius: 4px; font-family: monospace; font-size: 11.5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="feature-meta">Inventory & Asset Tracking</div>
+        <div class="task-title">Uniform & ID Supply Ledger</div>
+
+        <main class="stepper-pane">
+            
+            <div class="step-block completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-name">Open Inventory Dashboard</div>
+                    <div class="step-description">Access centralized asset control logs to view remaining physical resource allocations.</div>
+                </div>
+            </div>
+
+            <div class="step-block active">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-name">Monitor Stock Quantities & Audit Discrepancies</div>
+                    <div class="step-description">
+                        Review the current real-time counts calculated dynamically by student database trigger hand-outs. <br>
+                        <button type="button" class="blue-highlight-btn" onclick="toggleModal('inventory-modal', true)">View Supply Checklist Balance</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-name">Execute Restock & Supply Ingestion</div>
+                    <div class="step-description">Manually adjust inventory counts when bulk package shipments arrive from vendors.</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <div id="inventory-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 680px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-muted); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="font-size: 15px; color: var(--navy-dark); font-weight: 700;">Stock Checklist Balance</h3>
+                <button type="button" class="click-link" onclick="toggleModal('inventory-modal', false)" style="font-size: 20px; line-height: 1;">&times;</button>
+            </div>
+            
+            <p style="font-size: 13px; color: #475569; line-height: 1.5;">
+                This workspace syncs with your <code>Distribution Queue</code>. When a student receives an item, these balances automatically drop by 1 unit to prevent data discrepancies.
+            </p>
+
+            <table class="inventory-table">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Category</th>
+                        <th>In-Stock Quantity</th>
+                        <th>Alert Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Uniform Set - Medium (M)</strong></td>
+                        <td>Clothing Kit</td>
+                        <td id="stock-m">42 Units</td>
+                        <td><span class="status-badge badge-ok">In Stock</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Uniform Set - Large (L)</strong></td>
+                        <td>Clothing Kit</td>
+                        <td id="stock-l">8 Units</td>
+                        <td><span class="status-badge badge-low">Low Stock</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Blank Printable ID Cards</strong></td>
+                        <td>Registration Materials</td>
+                        <td>215 Units</td>
+                        <td><span class="status-badge badge-ok">In Stock</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-muted);">
+                <span style="font-size: 13px; font-weight: 700; color: var(--navy-dark); display: block; margin-bottom: 12px;">Ingest Bulk Supply Shipment (Stock-In)</span>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label>Select Item Target</label>
+                        <select id="restock-target">
+                            <option value="L">Uniform Set - Large (L)</option>
+                            <option value="M">Uniform Set - Medium (M)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Received Restock Amount</label>
+                        <input type="number" id="restock-qty" value="50" min="1">
+                    </div>
+                </div>
+
+                <div class="step-callout">
+                    ⚠️ <strong>PostgreSQL Asset Lock Rule:</strong> Committing this shipment triggers an internal ledger log table append to track accountability histories.
+                </div>
+
+                <button type="button" class="action-btn" onclick="commitRestockOperation()">Submit Restock Order</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function toggleModal(modalId, isVisible) {
+            const targetModal = document.getElementById(modalId);
+            if (isVisible) {
+                targetModal.classList.add('active');
+            } else {
+                targetModal.classList.remove('active');
+            }
+        }
+
+        function commitRestockOperation() {
+            const itemTarget = document.getElementById('restock-target').value;
+            const qtyInput = parseInt(document.getElementById('restock-qty').value);
+            
+            if (isNaN(qtyInput) || qtyInput <= 0) {
+                alert("Please input a valid positive quantity volume.");
+                return;
+            }
+
+            if (itemTarget === "L") {
+                document.getElementById('stock-l').innerHTML = `<strong>${8 + qtyInput} Units</strong>`;
+            } else {
+                document.getElementById('stock-m').innerHTML = `<strong>${42 + qtyInput} Units</strong>`;
+            }
+
+            alert(`Restock successful!\n\nBulk quantities added to PostgreSQL. Historical supply asset logs appended cleanly.`);
+            toggleModal('inventory-modal', false);
+        }
+    </script>
+</body>
+</html>
